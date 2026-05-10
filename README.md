@@ -1,73 +1,59 @@
-# React + TypeScript + Vite
+# Google Drive MP3 Player
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A lightweight, web-based MP3 player designed specifically for playing practice files directly from a public Google Drive folder.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Automatic Playlist:** Fetches all `.mp3` files from a specified Google Drive folder.
+- **Continuous Playback:** Automatically advances to the next track.
+- **Looping Modes:** Supports "No Loop", "Loop All" (wraps around), and "Loop One" (repeats current track).
+- **Full Controls:** Play/Pause, Next/Prev, Volume slider, and Progress seek bar.
+- **Persistent Settings:** Saves your Google API Key and Folder ID to `localStorage` for convenience.
+- **Mobile Friendly:** Fully responsive design with a modern dark theme.
 
-## React Compiler
+## Prerequisites
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. **Google API Key:** Create a project in the [Google Cloud Console](https://console.cloud.google.com/), enable the **Google Drive API**, and generate an API key.
+2. **Public Folder:** The Google Drive folder must be shared as **"Anyone with the link can view."**
+3. **Folder ID:** Obtain the Folder ID from the folder's URL (the string after `folders/`).
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Installation
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+```bash
+# Clone the repository
+git clone <repository-url>
+cd google-drive-player
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Install dependencies
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+### Build
+
+```bash
+npm run build
+```
+
+## Usage
+
+1. Launch the application.
+2. Click the **Settings** icon/button.
+3. Enter your **Google API Key** and **Folder ID**.
+4. Click **Load Playlist**.
+5. Your MP3 files will appear in the list. Click any track to start playing.
+
+## Tech Stack
+
+- **Framework:** React 19 (TypeScript)
+- **Build Tool:** Vite
+- **API:** Google Drive API v3
+- **Testing:** Vitest + React Testing Library
+- **Styling:** Vanilla CSS
