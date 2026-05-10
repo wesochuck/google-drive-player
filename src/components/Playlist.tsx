@@ -6,23 +6,39 @@ interface PlaylistProps {
   playlist: DriveFile[];
   currentIndex: number;
   onTrackSelect: (index: number) => void;
+  onFolderSelect: (folderId: string) => void;
+  onBack: () => void;
+  hasParentFolder: boolean;
 }
 
-export const Playlist: React.FC<PlaylistProps> = ({ playlist, currentIndex, onTrackSelect }) => {
-  if (playlist.length === 0) return null;
+export const Playlist: React.FC<PlaylistProps> = ({ 
+  playlist, 
+  currentIndex, 
+  onTrackSelect,
+  onFolderSelect,
+  onBack,
+  hasParentFolder
+}) => {
+  if (playlist.length === 0 && !hasParentFolder) return null;
 
   return (
     <div className="playlist">
-      <h3>Tracks</h3>
+      <h3>Playlist</h3>
       <ul>
-        {playlist.map((track, index) => (
+        {hasParentFolder && (
+          <li className="back-item" onClick={onBack}>
+            <span className="track-number">⬅️</span>
+            <span className="track-name">.. Back to Parent</span>
+          </li>
+        )}
+        {playlist.map((item, index) => (
           <li 
-            key={track.id} 
-            className={index === currentIndex ? 'active' : ''}
-            onClick={() => onTrackSelect(index)}
+            key={item.id} 
+            className={`${index === currentIndex && !item.isFolder ? 'active' : ''} ${item.isFolder ? 'folder' : ''}`}
+            onClick={() => item.isFolder ? onFolderSelect(item.id) : onTrackSelect(index)}
           >
-            <span className="track-number">{index + 1}.</span>
-            <span className="track-name">{track.name}</span>
+            <span className="track-number">{item.isFolder ? '📁' : (index + 1 + '.')}</span>
+            <span className="track-name">{item.name}</span>
           </li>
         ))}
       </ul>

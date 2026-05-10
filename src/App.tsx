@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import { Player } from './components/Player';
 import { Playlist } from './components/Playlist';
@@ -31,18 +31,25 @@ function App() {
 
   const [apiKey, setApiKey] = useState(() => urlKey || getStorageItem(STORAGE_KEY_API, ''));
   const [folderId, setFolderId] = useState(() => urlFolder || getStorageItem(STORAGE_KEY_FOLDER, ''));
+  const [folderHistory, setFolderHistory] = useState<string[]>(() => urlFolder ? [urlFolder] : []);
   const [playlist, setPlaylist] = useState<DriveFile[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showSettings, setShowSettings] = useState(() => {
-    // If we have URL params, don't show settings immediately
     if (urlKey && urlFolder) return false;
     return !apiKey || !folderId;
   });
 
-  const handleFetch = async (forcedKey?: string, forcedFolder?: string) => {
+  const updateUrl = useCallback((key: string, folder: string) => {
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.set('key', key);
+    newUrl.searchParams.set('folder', folder);
+    window.history.pushState({}, '', newUrl);
+  }, []);
+
+  const handleFetch = useCallback(async (forcedKey?: string, forcedFolder?: string) => {
     const activeKey = forcedKey || apiKey;
     const activeFolder = forcedFolder || folderId;
 
@@ -56,28 +63,31 @@ function App() {
       setIsLoading(true);
       setError(null);
       const files = await fetchPlaylist(activeFolder, activeKey);
-      if (files.length === 0) {
-        setError('No MP3 files found in the specified folder.');
-      } else {
-        setPlaylist(files);
-        setCurrentIndex(0);
-        setIsPlaying(false);
-        setShowSettings(false);
-      }
+      
+      setPlaylist(files);
+      setCurrentIndex(0);
+      setIsPlaying(false);
+      setShowSettings(false);
+      
+      setFolderId(activeFolder);
+      setFolderHistory(prev => {
+        if (prev[prev.length - 1] === activeFolder) return prev;
+        return [...prev, activeFolder];
+      });
+      updateUrl(activeKey, activeFolder);
     } catch (err) {
       setError('Failed to fetch playlist. Check your API key and Folder ID.');
       console.error(err);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [apiKey, folderId, updateUrl]);
 
   useEffect(() => {
-    // Auto-fetch if params are present on mount
     if (urlKey && urlFolder) {
       handleFetch(urlKey, urlFolder);
     }
-  }, [urlKey, urlFolder]); // Added dependencies for clarity
+  }, [urlKey, urlFolder, handleFetch]);
 
   useEffect(() => {
     setStorageItem(STORAGE_KEY_API, apiKey);
@@ -90,6 +100,19 @@ function App() {
   const handleTrackSelect = (index: number) => {
     setCurrentIndex(index);
     setIsPlaying(true);
+  };
+
+  const handleFolderSelect = (newFolderId: string) => {
+    handleFetch(apiKey, newFolderId);
+  };
+
+  const handleBack = () => {
+    if (folderHistory.length <= 1) return;
+    const newHistory = [...folderHistory];
+    newHistory.pop(); // remove current
+    const parentFolderId = newHistory[newHistory.length - 1];
+    setFolderHistory(newHistory);
+    handleFetch(apiKey, parentFolderId);
   };
 
   return (
@@ -155,7 +178,10 @@ function App() {
         <Playlist 
           playlist={playlist} 
           currentIndex={currentIndex} 
-          onTrackSelect={handleTrackSelect} 
+          onTrackSelect={handleTrackSelect}
+          onFolderSelect={handleFolderSelect}
+          onBack={handleBack}
+          hasParentFolder={folderHistory.length > 1}
         />
       </main>
 

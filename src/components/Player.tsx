@@ -102,22 +102,6 @@ export const Player: React.FC<PlayerProps> = ({
     }
   };
 
-  useEffect(() => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.play().catch(err => console.error("Playback error:", err));
-      } else {
-        audioRef.current.pause();
-      }
-    }
-  }, [currentIndex, isPlaying]);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-    }
-  }, [volume]);
-
   const handlePrev = () => {
     if (currentIndex > 0) {
       onTrackChange(currentIndex - 1);
@@ -133,6 +117,48 @@ export const Player: React.FC<PlayerProps> = ({
       onTrackChange(0);
     }
   };
+
+  useEffect(() => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.play().catch(err => {
+          if (err.name !== 'AbortError') {
+            console.error("Playback error:", err);
+          }
+        });
+      } else {
+        audioRef.current.pause();
+      }
+    }
+  }, [currentIndex, isPlaying]);
+
+  useEffect(() => {
+    if ('mediaSession' in navigator && currentTrack) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: currentTrack.name,
+        artist: 'Google Drive Player',
+      });
+
+      navigator.mediaSession.setActionHandler('play', () => {
+        audioRef.current?.play();
+        setIsPlaying(true);
+      });
+      navigator.mediaSession.setActionHandler('pause', () => {
+        audioRef.current?.pause();
+        setIsPlaying(false);
+      });
+      navigator.mediaSession.setActionHandler('previoustrack', handlePrev);
+      navigator.mediaSession.setActionHandler('nexttrack', handleNext);
+    }
+  }, [currentTrack, handlePrev, handleNext, setIsPlaying]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
+
+
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
@@ -177,6 +203,7 @@ export const Player: React.FC<PlayerProps> = ({
         onPause={() => setIsPlaying(false)}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
+        onError={(e) => console.error("Audio playback error:", e)}
       />
       
       <div className="progress-container">
