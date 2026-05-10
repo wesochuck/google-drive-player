@@ -24,26 +24,29 @@ const setStorageItem = (key: string, value: string) => {
   }
 };
 
+const searchParams = new URLSearchParams(window.location.search);
+const urlKey = searchParams.get('key');
+const urlFolder = searchParams.get('folder');
+
 function App() {
-  const [apiKey, setApiKey] = useState(() => getStorageItem(STORAGE_KEY_API, ''));
-  const [folderId, setFolderId] = useState(() => getStorageItem(STORAGE_KEY_FOLDER, ''));
+  const [apiKey, setApiKey] = useState(() => urlKey || getStorageItem(STORAGE_KEY_API, ''));
+  const [folderId, setFolderId] = useState(() => urlFolder || getStorageItem(STORAGE_KEY_FOLDER, ''));
   const [playlist, setPlaylist] = useState<DriveFile[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [showSettings, setShowSettings] = useState(!apiKey || !folderId);
+  const [showSettings, setShowSettings] = useState(() => {
+    // If we have URL params, don't show settings immediately
+    if (urlKey && urlFolder) return false;
+    return !apiKey || !folderId;
+  });
 
-  useEffect(() => {
-    setStorageItem(STORAGE_KEY_API, apiKey);
-  }, [apiKey]);
+  const handleFetch = async (forcedKey?: string, forcedFolder?: string) => {
+    const activeKey = forcedKey || apiKey;
+    const activeFolder = forcedFolder || folderId;
 
-  useEffect(() => {
-    setStorageItem(STORAGE_KEY_FOLDER, folderId);
-  }, [folderId]);
-
-  const handleFetch = async () => {
-    if (!apiKey || !folderId) {
+    if (!activeKey || !activeFolder) {
       setError('Please provide both API Key and Folder ID');
       setShowSettings(true);
       return;
@@ -52,7 +55,7 @@ function App() {
     try {
       setIsLoading(true);
       setError(null);
-      const files = await fetchPlaylist(folderId, apiKey);
+      const files = await fetchPlaylist(activeFolder, activeKey);
       if (files.length === 0) {
         setError('No MP3 files found in the specified folder.');
       } else {
@@ -68,6 +71,21 @@ function App() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    // Auto-fetch if params are present on mount
+    if (urlKey && urlFolder) {
+      handleFetch(urlKey, urlFolder);
+    }
+  }, []);
+
+  useEffect(() => {
+    setStorageItem(STORAGE_KEY_API, apiKey);
+  }, [apiKey]);
+
+  useEffect(() => {
+    setStorageItem(STORAGE_KEY_FOLDER, folderId);
+  }, [folderId]);
 
   const handleTrackSelect = (index: number) => {
     setCurrentIndex(index);
