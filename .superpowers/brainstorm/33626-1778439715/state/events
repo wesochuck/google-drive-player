@@ -1,0 +1,3 @@
+{"type":"click","text":"A\n    \n      Icon-Based Controls\n      Replace text labels (Play, Pause, Prev, Next) with standard media icons for a cleaner look.","choice":"icons","id":null,"timestamp":1778439773872}
+{"type":"click","text":"B\n    \n      Clearer Loop Labels\n      Use \"Repeat One\" and \"Repeat All\" text instead of icons to avoid confusion, or combined with a repeat icon.","choice":"loop-labels","id":null,"timestamp":1778439774890}
+{"type":"click","text":"C\n    \n      Mobile-First Spacing\n      Increase button sizes and adjust the layout for better usability on small screens.","choice":"mobile-layout","id":null,"timestamp":1778439775873}
