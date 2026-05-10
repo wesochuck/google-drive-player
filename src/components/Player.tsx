@@ -192,19 +192,23 @@ export const Player: React.FC<PlayerProps> = ({
 
   if (!currentTrack) return <div className="player empty">No track selected</div>;
 
+  const isFolder = currentTrack.isFolder;
+
   return (
     <div className="player">
       <h2>{currentTrack.name}</h2>
-      <audio 
-        ref={audioRef} 
-        src={currentTrack.streamUrl} 
-        onEnded={handleEnded}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleLoadedMetadata}
-        onError={(e) => console.error("Audio playback error:", e)}
-      />
+      {!isFolder && (
+        <audio 
+          ref={audioRef} 
+          src={currentTrack.streamUrl} 
+          onEnded={handleEnded}
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          onTimeUpdate={handleTimeUpdate}
+          onLoadedMetadata={handleLoadedMetadata}
+          onError={(e) => console.error("Audio playback error:", e)}
+        />
+      )}
       
       <div className="progress-container">
         <span>{formatTime(currentTime)}</span>
@@ -223,25 +227,26 @@ export const Player: React.FC<PlayerProps> = ({
       <div className="controls">
         <button 
           onClick={handlePrev} 
-          disabled={currentIndex === 0 && loopMode !== 'all'}
+          disabled={isFolder || (currentIndex === 0 && loopMode !== 'all')}
           aria-label="Previous"
         >
           <SkipPreviousIcon />
         </button>
         <button 
           onClick={togglePlay}
+          disabled={isFolder}
           aria-label={isPlaying ? 'Pause' : 'Play'}
         >
           {isPlaying ? <PauseIcon /> : <PlayIcon />}
         </button>
         <button 
           onClick={handleNext} 
-          disabled={currentIndex === playlist.length - 1 && loopMode !== 'all'}
+          disabled={isFolder || (currentIndex === playlist.length - 1 && loopMode !== 'all')}
           aria-label="Next"
         >
           <SkipNextIcon />
         </button>
-        <button onClick={cycleLoopMode} className={`repeat-button ${loopMode}`}>
+        <button onClick={cycleLoopMode} className={`repeat-button ${loopMode}`} disabled={isFolder}>
           {loopMode === 'one' ? <RepeatOneIcon /> : <RepeatIcon />}
           <span>{getRepeatLabel()}</span>
         </button>
@@ -256,6 +261,7 @@ export const Player: React.FC<PlayerProps> = ({
           step="0.01" 
           value={volume} 
           onChange={handleVolumeChange} 
+          disabled={isFolder}
         />
       </div>
     </div>

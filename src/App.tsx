@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import './App.css';
 import { Player } from './components/Player';
 import { Playlist } from './components/Playlist';
@@ -65,7 +65,9 @@ function App() {
       const files = await fetchPlaylist(activeFolder, activeKey);
       
       setPlaylist(files);
-      setCurrentIndex(0);
+      
+      const firstAudioIndex = files.findIndex(f => !f.isFolder);
+      setCurrentIndex(firstAudioIndex !== -1 ? firstAudioIndex : 0);
       setIsPlaying(false);
       setShowSettings(false);
       
@@ -83,8 +85,11 @@ function App() {
     }
   }, [apiKey, folderId, updateUrl]);
 
+  const initialFetchDone = useRef(false);
+
   useEffect(() => {
-    if (urlKey && urlFolder) {
+    if (urlKey && urlFolder && !initialFetchDone.current) {
+      initialFetchDone.current = true;
       handleFetch(urlKey, urlFolder);
     }
   }, [urlKey, urlFolder, handleFetch]);
