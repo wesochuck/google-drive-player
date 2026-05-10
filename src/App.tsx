@@ -50,8 +50,8 @@ function App() {
   }, []);
 
   const handleFetch = useCallback(async (forcedKey?: string, forcedFolder?: string) => {
-    const activeKey = forcedKey || apiKey;
-    const activeFolder = forcedFolder || folderId;
+    const activeKey = forcedKey !== undefined ? forcedKey : apiKey;
+    const activeFolder = forcedFolder !== undefined ? forcedFolder : folderId;
 
     if (!activeKey || !activeFolder) {
       setError('Please provide both API Key and Folder ID');

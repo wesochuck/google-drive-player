@@ -234,11 +234,21 @@ export const Player: React.FC<PlayerProps> = ({
               setPlayError("Bypassing mobile browser restrictions (secure download)...");
               try {
                 const response = await fetch(currentTrack.streamUrl);
-                if (!response.ok) throw new Error('Fetch failed with status: ' + response.status);
+                if (!response.ok) {
+                  const errText = await response.text();
+                  console.error("Fetch failed:", response.status, errText.substring(0, 200));
+                  throw new Error('Fetch failed with status: ' + response.status);
+                }
                 const blob = await response.blob();
+                if (blob.type.includes('text/html') || blob.type.includes('application/json')) {
+                  const errText = await blob.text();
+                  console.error("Invalid media blob:", blob.type, errText.substring(0, 200));
+                  throw new Error('Downloaded file is an error page, not audio.');
+                }
                 const objectUrl = URL.createObjectURL(blob);
                 setBlobUrl(objectUrl);
                 setPlayError(null);
+                setIsFetchingBlob(false);
                 if (isPlaying) safePlay();
               } catch (err) {
                 console.error("Blob fetch failed:", err);
