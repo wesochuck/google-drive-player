@@ -9,6 +9,8 @@ interface PlaylistProps {
   onFolderSelect: (folderId: string) => void;
   onBack: () => void;
   hasParentFolder: boolean;
+  onHome?: () => void;
+  isAtRoot?: boolean;
 }
 
 export const Playlist: React.FC<PlaylistProps> = ({ 
@@ -17,7 +19,9 @@ export const Playlist: React.FC<PlaylistProps> = ({
   onTrackSelect,
   onFolderSelect,
   onBack,
-  hasParentFolder
+  hasParentFolder,
+  onHome,
+  isAtRoot
 }) => {
   if (playlist.length === 0 && !hasParentFolder) return null;
 
@@ -29,6 +33,12 @@ export const Playlist: React.FC<PlaylistProps> = ({
           <li className="back-item" onClick={onBack}>
             <span className="track-number">⬅️</span>
             <span className="track-name">.. Back to Parent</span>
+          </li>
+        )}
+        {!hasParentFolder && !isAtRoot && onHome && (
+          <li className="back-item" onClick={onHome}>
+            <span className="track-number">🏠</span>
+            <span className="track-name">Home (Root Folder)</span>
           </li>
         )}
         {playlist.map((item, index) => (

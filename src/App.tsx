@@ -120,6 +120,16 @@ function App() {
     handleFetch(apiKey, parentFolderId);
   };
 
+  const rootFolderId = getStorageItem(STORAGE_KEY_FOLDER, '');
+  const isAtRoot = folderId === rootFolderId;
+
+  const handleHome = () => {
+    if (rootFolderId && rootFolderId !== folderId) {
+      setFolderHistory([rootFolderId]);
+      handleFetch(apiKey, rootFolderId);
+    }
+  };
+
   return (
     <div className="container">
       <header>
@@ -187,6 +197,8 @@ function App() {
           onFolderSelect={handleFolderSelect}
           onBack={handleBack}
           hasParentFolder={folderHistory.length > 1}
+          onHome={handleHome}
+          isAtRoot={isAtRoot}
         />
       </main>
 
