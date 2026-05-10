@@ -15,6 +15,8 @@ describe('Player', () => {
         playlist={mockPlaylist} 
         currentIndex={0} 
         onTrackChange={onTrackChange} 
+        isPlaying={false}
+        setIsPlaying={vi.fn()}
       />
     );
 
@@ -33,6 +35,8 @@ describe('Player', () => {
         playlist={mockPlaylist} 
         currentIndex={0} 
         onTrackChange={onTrackChange} 
+        isPlaying={false}
+        setIsPlaying={vi.fn()}
       />
     );
 
@@ -59,6 +63,8 @@ describe('Player', () => {
         playlist={mockPlaylist} 
         currentIndex={1} 
         onTrackChange={onTrackChange} 
+        isPlaying={false}
+        setIsPlaying={vi.fn()}
       />
     );
 
@@ -82,6 +88,8 @@ describe('Player', () => {
           playlist={mockPlaylist} 
           currentIndex={1} 
           onTrackChange={onTrackChange} 
+          isPlaying={false}
+          setIsPlaying={vi.fn()}
         />
       );
 
@@ -102,6 +110,8 @@ describe('Player', () => {
           playlist={mockPlaylist} 
           currentIndex={0} 
           onTrackChange={onTrackChange} 
+          isPlaying={false}
+          setIsPlaying={vi.fn()}
         />
       );
 
@@ -121,6 +131,8 @@ describe('Player', () => {
           playlist={mockPlaylist} 
           currentIndex={0} 
           onTrackChange={vi.fn()} 
+          isPlaying={false}
+          setIsPlaying={vi.fn()}
         />
       );
 
@@ -132,6 +144,8 @@ describe('Player', () => {
           playlist={mockPlaylist} 
           currentIndex={1} 
           onTrackChange={vi.fn()} 
+          isPlaying={false}
+          setIsPlaying={vi.fn()}
         />
       );
 

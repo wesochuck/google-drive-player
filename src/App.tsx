@@ -7,21 +7,39 @@ import { fetchPlaylist, type DriveFile } from './services/driveService';
 const STORAGE_KEY_API = 'gdrive_player_api_key';
 const STORAGE_KEY_FOLDER = 'gdrive_player_folder_id';
 
+const getStorageItem = (key: string, defaultValue: string): string => {
+  try {
+    return localStorage.getItem(key) || defaultValue;
+  } catch (e) {
+    console.warn(`Error reading ${key} from localStorage:`, e);
+    return defaultValue;
+  }
+};
+
+const setStorageItem = (key: string, value: string) => {
+  try {
+    localStorage.setItem(key, value);
+  } catch (e) {
+    console.warn(`Error writing ${key} to localStorage:`, e);
+  }
+};
+
 function App() {
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem(STORAGE_KEY_API) || '');
-  const [folderId, setFolderId] = useState(() => localStorage.getItem(STORAGE_KEY_FOLDER) || '');
+  const [apiKey, setApiKey] = useState(() => getStorageItem(STORAGE_KEY_API, ''));
+  const [folderId, setFolderId] = useState(() => getStorageItem(STORAGE_KEY_FOLDER, ''));
   const [playlist, setPlaylist] = useState<DriveFile[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showSettings, setShowSettings] = useState(!apiKey || !folderId);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY_API, apiKey);
+    setStorageItem(STORAGE_KEY_API, apiKey);
   }, [apiKey]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY_FOLDER, folderId);
+    setStorageItem(STORAGE_KEY_FOLDER, folderId);
   }, [folderId]);
 
   const handleFetch = async () => {
@@ -40,6 +58,7 @@ function App() {
       } else {
         setPlaylist(files);
         setCurrentIndex(0);
+        setIsPlaying(false);
         setShowSettings(false);
       }
     } catch (err) {
@@ -48,6 +67,11 @@ function App() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleTrackSelect = (index: number) => {
+    setCurrentIndex(index);
+    setIsPlaying(true);
   };
 
   return (
@@ -105,13 +129,15 @@ function App() {
         <Player 
           playlist={playlist} 
           currentIndex={currentIndex} 
-          onTrackChange={setCurrentIndex} 
+          onTrackChange={setCurrentIndex}
+          isPlaying={isPlaying}
+          setIsPlaying={setIsPlaying}
         />
 
         <Playlist 
           playlist={playlist} 
           currentIndex={currentIndex} 
-          onTrackSelect={setCurrentIndex} 
+          onTrackSelect={handleTrackSelect} 
         />
       </main>
 

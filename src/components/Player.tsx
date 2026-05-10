@@ -8,10 +8,17 @@ interface PlayerProps {
   playlist: DriveFile[];
   currentIndex: number;
   onTrackChange: (index: number) => void;
+  isPlaying: boolean;
+  setIsPlaying: (playing: boolean) => void;
 }
 
-export const Player: React.FC<PlayerProps> = ({ playlist, currentIndex, onTrackChange }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
+export const Player: React.FC<PlayerProps> = ({ 
+  playlist, 
+  currentIndex, 
+  onTrackChange,
+  isPlaying,
+  setIsPlaying
+}) => {
   const [loopMode, setLoopMode] = useState<LoopMode>('none');
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -21,9 +28,13 @@ export const Player: React.FC<PlayerProps> = ({ playlist, currentIndex, onTrackC
   const currentTrack = playlist[currentIndex];
 
   const togglePlay = () => {
-    if (isPlaying) audioRef.current?.pause();
-    else audioRef.current?.play();
-    setIsPlaying(!isPlaying);
+    if (isPlaying) {
+      audioRef.current?.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current?.play();
+      setIsPlaying(true);
+    }
   };
 
   const handleEnded = () => {
@@ -48,8 +59,12 @@ export const Player: React.FC<PlayerProps> = ({ playlist, currentIndex, onTrackC
   };
 
   useEffect(() => {
-    if (isPlaying && audioRef.current) {
-      audioRef.current.play().catch(err => console.error("Playback error:", err));
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.play().catch(err => console.error("Playback error:", err));
+      } else {
+        audioRef.current.pause();
+      }
     }
   }, [currentIndex, isPlaying]);
 

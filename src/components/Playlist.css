@@ -10,7 +10,7 @@
 .playlist h3 {
   margin-top: 0;
   margin-bottom: 1rem;
-  color: #646cff;
+  color: var(--accent-color);
   font-size: 1.2rem;
   border-bottom: 1px solid rgba(100, 108, 255, 0.2);
   padding-bottom: 0.5rem;
@@ -38,7 +38,7 @@
 }
 
 .playlist li.active {
-  background: #646cff;
+  background: var(--accent-color);
   color: white;
 }
 
@@ -47,7 +47,7 @@
 }
 
 .track-number {
-  color: #888;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   min-width: 1.5rem;
 }
