@@ -3,8 +3,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { Playlist } from './Playlist';
 
 const mockPlaylist = [
-  { id: '1', name: 'Track 1', streamUrl: 'url1' },
-  { id: '2', name: 'Track 2', streamUrl: 'url2' },
+  { id: '1', name: 'Track 1', streamUrl: 'url1', isFolder: false },
+  { id: '2', name: 'Track 2', streamUrl: 'url2', isFolder: false },
 ];
 
 describe('Playlist', () => {
@@ -13,7 +13,10 @@ describe('Playlist', () => {
       <Playlist 
         playlist={[]} 
         currentIndex={0} 
-        onTrackSelect={vi.fn()} 
+        onTrackSelect={vi.fn()}
+        onFolderSelect={vi.fn()}
+        onBack={vi.fn()}
+        hasParentFolder={false}
       />
     );
     expect(container.firstChild).toBeNull();
@@ -24,7 +27,10 @@ describe('Playlist', () => {
       <Playlist 
         playlist={mockPlaylist} 
         currentIndex={0} 
-        onTrackSelect={vi.fn()} 
+        onTrackSelect={vi.fn()}
+        onFolderSelect={vi.fn()}
+        onBack={vi.fn()}
+        hasParentFolder={false}
       />
     );
 
@@ -39,7 +45,10 @@ describe('Playlist', () => {
       <Playlist 
         playlist={mockPlaylist} 
         currentIndex={1} 
-        onTrackSelect={vi.fn()} 
+        onTrackSelect={vi.fn()}
+        onFolderSelect={vi.fn()}
+        onBack={vi.fn()}
+        hasParentFolder={false}
       />
     );
 
@@ -54,7 +63,10 @@ describe('Playlist', () => {
       <Playlist 
         playlist={mockPlaylist} 
         currentIndex={0} 
-        onTrackSelect={onTrackSelect} 
+        onTrackSelect={onTrackSelect}
+        onFolderSelect={vi.fn()}
+        onBack={vi.fn()}
+        hasParentFolder={false}
       />
     );
 

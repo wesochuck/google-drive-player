@@ -3,8 +3,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { Player } from './Player';
 
 const mockPlaylist = [
-  { id: '1', name: 'Track 1', streamUrl: 'url1' },
-  { id: '2', name: 'Track 2', streamUrl: 'url2' },
+  { id: '1', name: 'Track 1', streamUrl: 'url1', isFolder: false },
+  { id: '2', name: 'Track 2', streamUrl: 'url2', isFolder: false },
 ];
 
 describe('Player', () => {
