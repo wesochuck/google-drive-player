@@ -62,6 +62,7 @@ export const Player: React.FC<PlayerProps> = ({
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playError, setPlayError] = useState<string | null>(null);
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [fallbackUrl, setFallbackUrl] = useState<string | null>(null);
   const [isFetchingBlob, setIsFetchingBlob] = useState(false);
 
   const currentTrack = playlist[currentIndex];
@@ -72,6 +73,7 @@ export const Player: React.FC<PlayerProps> = ({
       URL.revokeObjectURL(blobUrl);
       setBlobUrl(null);
     }
+    setFallbackUrl(null);
     setPlayError(null);
     setIsFetchingBlob(false);
   }, [currentIndex]);
@@ -151,7 +153,7 @@ export const Player: React.FC<PlayerProps> = ({
         audioRef.current.pause();
       }
     }
-  }, [currentIndex, isPlaying, isFolder, blobUrl]);
+  }, [currentIndex, isPlaying, isFolder, blobUrl, fallbackUrl]);
 
   useEffect(() => {
     if ('mediaSession' in navigator && currentTrack) {
@@ -221,7 +223,7 @@ export const Player: React.FC<PlayerProps> = ({
       {!isFolder && (
         <audio 
           ref={audioRef} 
-          src={blobUrl || currentTrack.streamUrl} 
+          src={fallbackUrl || blobUrl || currentTrack.streamUrl} 
           onEnded={handleEnded}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
@@ -229,6 +231,12 @@ export const Player: React.FC<PlayerProps> = ({
           onLoadedMetadata={handleLoadedMetadata}
           onError={async (e) => {
             console.error("Audio playback error:", e);
+            if (fallbackUrl) {
+              setPlayError("Could not load this track. It may be restricted, or you need to log into Google Drive.");
+              setIsPlaying(false);
+              return;
+            }
+
             if (!blobUrl && !isFetchingBlob && currentTrack && !isFolder) {
               setIsFetchingBlob(true);
               setPlayError("Bypassing mobile browser restrictions (secure download)...");
@@ -251,9 +259,10 @@ export const Player: React.FC<PlayerProps> = ({
                 setIsFetchingBlob(false);
                 if (isPlaying) safePlay();
               } catch (err) {
-                console.error("Blob fetch failed:", err);
-                setPlayError("Could not load this track. It may be restricted or unsupported.");
-                setIsPlaying(false);
+                console.error("Blob fetch failed, falling back to Google Drive cookie endpoint:", err);
+                const newFallback = `https://drive.google.com/uc?export=download&id=${currentTrack.id}`;
+                setFallbackUrl(newFallback);
+                setPlayError("Attempting alternative streaming method...");
                 setIsFetchingBlob(false);
               }
             } else if (!isFetchingBlob) {
