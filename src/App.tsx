@@ -130,7 +130,7 @@ function App() {
           </div>
           <button 
             className="primary-button" 
-            onClick={handleFetch}
+            onClick={() => handleFetch()}
             disabled={isLoading}
           >
             {isLoading ? 'Loading...' : 'Load Playlist'}
