@@ -24,11 +24,11 @@ const setStorageItem = (key: string, value: string) => {
   }
 };
 
-const searchParams = new URLSearchParams(window.location.search);
-const urlKey = searchParams.get('key');
-const urlFolder = searchParams.get('folder');
-
 function App() {
+  const [params] = useState(() => new URLSearchParams(window.location.search));
+  const urlKey = params.get('key');
+  const urlFolder = params.get('folder');
+
   const [apiKey, setApiKey] = useState(() => urlKey || getStorageItem(STORAGE_KEY_API, ''));
   const [folderId, setFolderId] = useState(() => urlFolder || getStorageItem(STORAGE_KEY_FOLDER, ''));
   const [playlist, setPlaylist] = useState<DriveFile[]>([]);
@@ -77,7 +77,7 @@ function App() {
     if (urlKey && urlFolder) {
       handleFetch(urlKey, urlFolder);
     }
-  }, []);
+  }, [urlKey, urlFolder]); // Added dependencies for clarity
 
   useEffect(() => {
     setStorageItem(STORAGE_KEY_API, apiKey);
