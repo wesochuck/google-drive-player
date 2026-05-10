@@ -46,7 +46,7 @@ describe('Player', () => {
     const playSpy = vi.spyOn(audio, 'play').mockImplementation(() => Promise.resolve());
 
     // Cycle to 'all' then to 'one'
-    const loopButton = screen.getByText(/Loop: none/i);
+    const loopButton = screen.getByText(/No Repeat/i);
     fireEvent.click(loopButton); // now 'all'
     fireEvent.click(loopButton); // now 'one'
 
@@ -72,7 +72,7 @@ describe('Player', () => {
     if (!audio) throw new Error('Audio element not found');
 
     // Cycle to 'all'
-    const loopButton = screen.getByText(/Loop: none/i);
+    const loopButton = screen.getByText(/No Repeat/i);
     fireEvent.click(loopButton);
 
     fireEvent.ended(audio);
@@ -93,10 +93,10 @@ describe('Player', () => {
         />
       );
 
-      const loopButton = screen.getByText(/Loop: none/i);
+      const loopButton = screen.getByText(/No Repeat/i);
       fireEvent.click(loopButton); // now 'all'
 
-      const nextButton = screen.getByText('Next');
+      const nextButton = screen.getByRole('button', { name: /next/i });
       expect(nextButton).not.toBeDisabled();
       fireEvent.click(nextButton);
 
@@ -115,10 +115,10 @@ describe('Player', () => {
         />
       );
 
-      const loopButton = screen.getByText(/Loop: none/i);
+      const loopButton = screen.getByText(/No Repeat/i);
       fireEvent.click(loopButton); // now 'all'
 
-      const prevButton = screen.getByText('Prev');
+      const prevButton = screen.getByRole('button', { name: /prev/i });
       expect(prevButton).not.toBeDisabled();
       fireEvent.click(prevButton);
 
@@ -136,8 +136,8 @@ describe('Player', () => {
         />
       );
 
-      expect(screen.getByText('Prev')).toBeDisabled();
-      expect(screen.getByText('Next')).not.toBeDisabled();
+      expect(screen.getByRole('button', { name: /prev/i })).toBeDisabled();
+      expect(screen.getByRole('button', { name: /next/i })).not.toBeDisabled();
 
       rerender(
         <Player 
@@ -149,8 +149,8 @@ describe('Player', () => {
         />
       );
 
-      expect(screen.getByText('Prev')).not.toBeDisabled();
-      expect(screen.getByText('Next')).toBeDisabled();
+      expect(screen.getByRole('button', { name: /prev/i })).not.toBeDisabled();
+      expect(screen.getByRole('button', { name: /next/i })).toBeDisabled();
     });
   });
 });
