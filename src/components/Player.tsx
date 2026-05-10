@@ -61,12 +61,19 @@ export const Player: React.FC<PlayerProps> = ({
   const [volume, setVolume] = useState(1);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playError, setPlayError] = useState<string | null>(null);
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [isFetchingBlob, setIsFetchingBlob] = useState(false);
 
   const currentTrack = playlist[currentIndex];
   const isFolder = currentTrack?.isFolder || false;
 
   useEffect(() => {
+    if (blobUrl) {
+      URL.revokeObjectURL(blobUrl);
+      setBlobUrl(null);
+    }
     setPlayError(null);
+    setIsFetchingBlob(false);
   }, [currentIndex]);
 
   const safePlay = () => {
@@ -144,7 +151,7 @@ export const Player: React.FC<PlayerProps> = ({
         audioRef.current.pause();
       }
     }
-  }, [currentIndex, isPlaying, isFolder]);
+  }, [currentIndex, isPlaying, isFolder, blobUrl]);
 
   useEffect(() => {
     if ('mediaSession' in navigator && currentTrack) {
@@ -214,16 +221,35 @@ export const Player: React.FC<PlayerProps> = ({
       {!isFolder && (
         <audio 
           ref={audioRef} 
-          src={currentTrack.streamUrl} 
+          src={blobUrl || currentTrack.streamUrl} 
           onEnded={handleEnded}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}
-          onError={(e) => {
+          onError={async (e) => {
             console.error("Audio playback error:", e);
-            setPlayError("Could not load this track. It may be restricted or unsupported.");
-            setIsPlaying(false);
+            if (!blobUrl && !isFetchingBlob && currentTrack && !isFolder) {
+              setIsFetchingBlob(true);
+              setPlayError("Bypassing mobile browser restrictions (secure download)...");
+              try {
+                const response = await fetch(currentTrack.streamUrl);
+                if (!response.ok) throw new Error('Fetch failed with status: ' + response.status);
+                const blob = await response.blob();
+                const objectUrl = URL.createObjectURL(blob);
+                setBlobUrl(objectUrl);
+                setPlayError(null);
+                if (isPlaying) safePlay();
+              } catch (err) {
+                console.error("Blob fetch failed:", err);
+                setPlayError("Could not load this track. It may be restricted or unsupported.");
+                setIsPlaying(false);
+                setIsFetchingBlob(false);
+              }
+            } else if (!isFetchingBlob) {
+              setPlayError("Could not load this track. It may be restricted or unsupported.");
+              setIsPlaying(false);
+            }
           }}
         />
       )}
