@@ -60,15 +60,33 @@ export const Player: React.FC<PlayerProps> = ({
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [playError, setPlayError] = useState<string | null>(null);
 
   const currentTrack = playlist[currentIndex];
+  const isFolder = currentTrack?.isFolder || false;
+
+  useEffect(() => {
+    setPlayError(null);
+  }, [currentIndex]);
+
+  const safePlay = () => {
+    if (audioRef.current) {
+      audioRef.current.play().catch(err => {
+        if (err.name !== 'AbortError') {
+          console.error("Playback error:", err);
+          setPlayError("Could not play this track. It may be restricted or unsupported.");
+          setIsPlaying(false);
+        }
+      });
+    }
+  };
 
   const togglePlay = () => {
     if (isPlaying) {
       audioRef.current?.pause();
       setIsPlaying(false);
     } else {
-      audioRef.current?.play();
+      safePlay();
       setIsPlaying(true);
     }
   };
@@ -77,7 +95,7 @@ export const Player: React.FC<PlayerProps> = ({
     if (loopMode === 'one') {
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
-        audioRef.current.play();
+        safePlay();
       }
     } else if (currentIndex < playlist.length - 1) {
       onTrackChange(currentIndex + 1);
@@ -119,18 +137,14 @@ export const Player: React.FC<PlayerProps> = ({
   };
 
   useEffect(() => {
-    if (audioRef.current) {
+    if (audioRef.current && !isFolder) {
       if (isPlaying) {
-        audioRef.current.play().catch(err => {
-          if (err.name !== 'AbortError') {
-            console.error("Playback error:", err);
-          }
-        });
+        safePlay();
       } else {
         audioRef.current.pause();
       }
     }
-  }, [currentIndex, isPlaying]);
+  }, [currentIndex, isPlaying, isFolder]);
 
   useEffect(() => {
     if ('mediaSession' in navigator && currentTrack) {
@@ -140,7 +154,7 @@ export const Player: React.FC<PlayerProps> = ({
       });
 
       navigator.mediaSession.setActionHandler('play', () => {
-        audioRef.current?.play();
+        safePlay();
         setIsPlaying(true);
       });
       navigator.mediaSession.setActionHandler('pause', () => {
@@ -192,7 +206,7 @@ export const Player: React.FC<PlayerProps> = ({
 
   if (!currentTrack) return <div className="player empty">No track selected</div>;
 
-  const isFolder = currentTrack.isFolder;
+
 
   return (
     <div className="player">
@@ -206,9 +220,15 @@ export const Player: React.FC<PlayerProps> = ({
           onPause={() => setIsPlaying(false)}
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}
-          onError={(e) => console.error("Audio playback error:", e)}
+          onError={(e) => {
+            console.error("Audio playback error:", e);
+            setPlayError("Could not load this track. It may be restricted or unsupported.");
+            setIsPlaying(false);
+          }}
         />
       )}
+      
+      {playError && <div className="error-message" style={{ margin: '10px 0', padding: '10px', fontSize: '0.9rem' }}>{playError}</div>}
       
       <div className="progress-container">
         <span>{formatTime(currentTime)}</span>
