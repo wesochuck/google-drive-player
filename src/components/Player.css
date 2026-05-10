@@ -126,7 +126,7 @@
 }
 
 .volume-container {
-  display: flex;
+  display: none;
   align-items: center;
   gap: 1rem;
   justify-content: center;
@@ -197,5 +197,9 @@
 
   .controls .repeat-button span {
     display: inline;
+  }
+
+  .volume-container {
+    display: flex;
   }
 }

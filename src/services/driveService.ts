@@ -20,6 +20,7 @@ export const fetchPlaylist = async (folderId: string, apiKey: string): Promise<D
     q: `'${folderId}' in parents and (mimeType='audio/mpeg' or mimeType='application/vnd.google-apps.folder')`,
     key: apiKey,
     fields: 'files(id,name,mimeType)',
+    orderBy: 'folder,name',
   });
   const url = `https://www.googleapis.com/drive/v3/files?${params.toString()}`;
   const response = await fetch(url);
