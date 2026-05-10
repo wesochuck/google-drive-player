@@ -181,11 +181,12 @@ h1 {
 /* Responsive adjustments */
 @media (max-width: 600px) {
   .container {
-    padding: 1rem;
+    padding: 1rem 0.5rem;
   }
   
   .card {
-    padding: 1rem;
+    padding: 1rem 0.75rem;
+    border-radius: 12px;
   }
   
   h1 {

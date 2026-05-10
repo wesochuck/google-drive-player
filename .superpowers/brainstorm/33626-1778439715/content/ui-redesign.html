@@ -1,0 +1,92 @@
+<h2>Mobile & Controls Redesign</h2>
+<p class="subtitle">Improving touch targets, replacing text with icons, and clarifying loop modes.</p>
+
+<div class="options" data-multiselect>
+  <div class="option" data-choice="icons" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Icon-Based Controls</h3>
+      <p>Replace text labels (Play, Pause, Prev, Next) with standard media icons for a cleaner look.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="loop-labels" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Clearer Loop Labels</h3>
+      <p>Use "Repeat One" and "Repeat All" text instead of icons to avoid confusion, or combined with a repeat icon.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="mobile-layout" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Mobile-First Spacing</h3>
+      <p>Increase button sizes and adjust the layout for better usability on small screens.</p>
+    </div>
+  </div>
+</div>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">Current Design</div>
+    <div class="mockup-body" style="background: #1a1a1a; padding: 20px; border-radius: 8px; text-align: center;">
+      <div style="color: #646cff; font-weight: bold; margin-bottom: 20px;">song1.mp3</div>
+      <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
+        <button style="background: #333; color: white; border: none; padding: 10px 15px; border-radius: 4px;">Prev</button>
+        <button style="background: #646cff; color: white; border: none; padding: 10px 15px; border-radius: 50%; width: 50px; height: 50px;">Play</button>
+        <button style="background: #333; color: white; border: none; padding: 10px 15px; border-radius: 4px;">Next</button>
+        <button style="background: #333; color: white; border: none; padding: 10px 15px; border-radius: 4px;">Loop: none</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup">
+    <div class="mockup-header">Proposed Redesign</div>
+    <div class="mockup-body" style="background: #1a1a1a; padding: 20px; border-radius: 8px; text-align: center;">
+      <div style="color: white; font-weight: bold; margin-bottom: 20px; font-size: 1.1rem;">song1.mp3</div>
+      
+      <!-- Progress Bar -->
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+        <span style="font-size: 0.8rem; color: #b3b3b3;">0:45</span>
+        <div style="flex-grow: 1; height: 4px; background: #444; border-radius: 2px; position: relative;">
+          <div style="width: 30%; height: 100%; background: #646cff; border-radius: 2px;"></div>
+          <div style="width: 12px; height: 12px; background: white; border-radius: 50%; position: absolute; top: -4px; left: 30%; transform: translateX(-50%);"></div>
+        </div>
+        <span style="font-size: 0.8rem; color: #b3b3b3;">3:20</span>
+      </div>
+
+      <!-- Main Controls -->
+      <div style="display: flex; justify-content: center; align-items: center; gap: 25px; margin-bottom: 25px;">
+        <!-- Prev Icon -->
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M6 6h2v12H6zm3.5 6L18 18V6z"/></svg>
+        
+        <!-- Play/Pause Button -->
+        <div style="background: #646cff; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(100, 108, 255, 0.4);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        
+        <!-- Next Icon -->
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+      </div>
+
+      <!-- Loop Options -->
+      <div style="display: flex; justify-content: center; gap: 10px;">
+        <div style="background: rgba(255,255,255,0.1); border: 1px solid #646cff; color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+          Repeat All
+        </div>
+        <div style="background: rgba(255,255,255,0.05); color: #b3b3b3; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem;">
+          Repeat One
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Key Mobile Fixes</h3>
+  <ul>
+    <li><strong>Larger Hit Areas:</strong> Controls are spaced further apart to prevent accidental taps.</li>
+    <li><strong>Full-Width Playlist:</strong> On mobile, the playlist will expand to fill the width for easier scrolling.</li>
+    <li><strong>Better Typography:</strong> Increased contrast and font sizes for better readability.</li>
+  </ul>
+</div>

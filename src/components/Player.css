@@ -1,20 +1,10 @@
 .player {
   background: var(--card-bg);
   border-radius: 16px;
-  padding: 1.5rem;
+  padding: 1rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  margin-bottom: 2rem;
-  text-align: center;
-}
-
-.player h2 {
-  font-size: 1.25rem;
-  margin-top: 0;
   margin-bottom: 1.5rem;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  text-align: center;
 }
 
 .player.empty {
@@ -23,12 +13,22 @@
   padding: 3rem 1.5rem;
 }
 
+.player h2 {
+  font-size: 1.3rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .progress-container {
   display: flex;
   align-items: center;
   gap: 1rem;
   margin-bottom: 1.5rem;
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
 }
@@ -37,7 +37,7 @@
   flex-grow: 1;
   height: 4px;
   -webkit-appearance: none;
-  background: rgba(255, 255, 255, 0.1);
+  background: color-mix(in srgb, var(--text-primary), transparent 90%);
   border-radius: 2px;
   outline: none;
   cursor: pointer;
@@ -60,25 +60,27 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
   margin-bottom: 1.5rem;
 }
 
 .controls button {
-  background: rgba(255, 255, 255, 0.05);
+  background: color-mix(in srgb, var(--text-primary), transparent 95%);
   border: none;
   color: white;
-  padding: 0.6rem 1rem;
-  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 50%;
   cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
   transition: all 0.2s;
-  min-width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .controls button:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
+  background: color-mix(in srgb, var(--text-primary), transparent 90%);
 }
 
 .controls button:disabled {
@@ -88,20 +90,35 @@
 
 .controls button:nth-child(2) {
   background: var(--accent-color);
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  min-width: unset;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  box-shadow: 0 4px 12px rgba(100, 108, 255, 0.3);
+  width: 64px;
+  height: 64px;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-color), transparent 70%);
 }
 
 .controls button:nth-child(2):hover {
   background: var(--accent-hover);
   transform: scale(1.05);
+}
+
+.controls .repeat-button {
+  width: 48px;
+  height: 48px;
+  min-height: 44px;
+  border-radius: 50%;
+  padding: 0.5rem;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  min-width: unset;
+}
+
+.controls .repeat-button span {
+  display: none;
+}
+
+.repeat-button.all, .repeat-button.one {
+  color: var(--accent-color);
+  background: color-mix(in srgb, var(--accent-color), transparent 85%);
+  border: 1px solid color-mix(in srgb, var(--accent-color), transparent 70%);
 }
 
 .volume-container {
@@ -122,7 +139,7 @@
   flex-grow: 1;
   height: 4px;
   -webkit-appearance: none;
-  background: rgba(255, 255, 255, 0.1);
+  background: color-mix(in srgb, var(--text-primary), transparent 90%);
   border-radius: 2px;
   outline: none;
 }
@@ -133,4 +150,48 @@
   height: 10px;
   background: var(--text-secondary);
   border-radius: 50%;
+}
+
+/* Desktop Overrides */
+@media (min-width: 601px) {
+  .player {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .player h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .progress-container {
+    font-size: 0.85rem;
+  }
+
+  .controls {
+    gap: 1rem;
+  }
+
+  .controls button:not(.repeat-button) {
+    width: 44px;
+    height: 44px;
+  }
+
+  .controls button:nth-child(2) {
+    width: 56px;
+    height: 56px;
+  }
+
+  .controls .repeat-button {
+    width: auto;
+    height: auto;
+    min-height: 44px;
+    border-radius: 22px;
+    padding: 0.4rem 1rem;
+    min-width: 110px;
+  }
+
+  .controls .repeat-button span {
+    display: inline;
+  }
 }

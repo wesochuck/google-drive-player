@@ -2,6 +2,42 @@ import React, { useState, useRef, useEffect } from 'react';
 import type { DriveFile } from '../services/driveService';
 import './Player.css';
 
+const PlayIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M8 5v14l11-7z" />
+  </svg>
+);
+
+const PauseIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+  </svg>
+);
+
+const SkipNextIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+  </svg>
+);
+
+const SkipPreviousIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
+  </svg>
+);
+
+const RepeatIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z" />
+  </svg>
+);
+
+const RepeatOneIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zm-4-2V9h-1l-2 1v1h1.5v4H13z" />
+  </svg>
+);
+
 type LoopMode = 'none' | 'all' | 'one';
 
 interface PlayerProps {
@@ -56,6 +92,14 @@ export const Player: React.FC<PlayerProps> = ({
     const modes: LoopMode[] = ['none', 'all', 'one'];
     const next = modes[(modes.indexOf(loopMode) + 1) % modes.length];
     setLoopMode(next);
+  };
+
+  const getRepeatLabel = () => {
+    switch (loopMode) {
+      case 'one': return 'Repeat One';
+      case 'all': return 'Repeat All';
+      default: return 'No Repeat';
+    }
   };
 
   useEffect(() => {
@@ -150,10 +194,30 @@ export const Player: React.FC<PlayerProps> = ({
       </div>
 
       <div className="controls">
-        <button onClick={handlePrev} disabled={currentIndex === 0 && loopMode !== 'all'}>Prev</button>
-        <button onClick={togglePlay}>{isPlaying ? 'Pause' : 'Play'}</button>
-        <button onClick={handleNext} disabled={currentIndex === playlist.length - 1 && loopMode !== 'all'}>Next</button>
-        <button onClick={cycleLoopMode}>Loop: {loopMode}</button>
+        <button 
+          onClick={handlePrev} 
+          disabled={currentIndex === 0 && loopMode !== 'all'}
+          aria-label="Previous"
+        >
+          <SkipPreviousIcon />
+        </button>
+        <button 
+          onClick={togglePlay}
+          aria-label={isPlaying ? 'Pause' : 'Play'}
+        >
+          {isPlaying ? <PauseIcon /> : <PlayIcon />}
+        </button>
+        <button 
+          onClick={handleNext} 
+          disabled={currentIndex === playlist.length - 1 && loopMode !== 'all'}
+          aria-label="Next"
+        >
+          <SkipNextIcon />
+        </button>
+        <button onClick={cycleLoopMode} className={`repeat-button ${loopMode}`}>
+          {loopMode === 'one' ? <RepeatOneIcon /> : <RepeatIcon />}
+          <span>{getRepeatLabel()}</span>
+        </button>
       </div>
 
       <div className="volume-container">
