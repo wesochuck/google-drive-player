@@ -27,6 +27,9 @@ describe('App component', () => {
     fireEvent.change(apiKeyInput, { target: { value: 'test-api-key' } })
     fireEvent.change(folderIdInput, { target: { value: 'test-folder-id' } })
 
+    const loadButton = screen.getByRole('button', { name: /Load Playlist/i })
+    fireEvent.click(loadButton)
+
     expect(localStorage.getItem('gdrive_player_api_key')).toBe('test-api-key')
     expect(localStorage.getItem('gdrive_player_folder_id')).toBe('test-folder-id')
 

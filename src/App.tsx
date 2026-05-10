@@ -98,9 +98,11 @@ function App() {
     setStorageItem(STORAGE_KEY_API, apiKey);
   }, [apiKey]);
 
-  useEffect(() => {
+  const handleLoadPlaylist = () => {
+    setStorageItem(STORAGE_KEY_API, apiKey);
     setStorageItem(STORAGE_KEY_FOLDER, folderId);
-  }, [folderId]);
+    handleFetch();
+  };
 
   const handleTrackSelect = (index: number) => {
     setCurrentIndex(index);
@@ -168,7 +170,7 @@ function App() {
           </div>
           <button 
             className="primary-button" 
-            onClick={() => handleFetch()}
+            onClick={handleLoadPlaylist}
             disabled={isLoading}
           >
             {isLoading ? 'Loading...' : 'Load Playlist'}

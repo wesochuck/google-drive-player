@@ -29,6 +29,6 @@ export const fetchPlaylist = async (folderId: string, apiKey: string): Promise<D
     id: file.id,
     name: file.name,
     isFolder: file.mimeType === 'application/vnd.google-apps.folder',
-    streamUrl: `https://drive.google.com/uc?export=download&id=${file.id}`
+    streamUrl: `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media&key=${apiKey}`
   }));
 };
