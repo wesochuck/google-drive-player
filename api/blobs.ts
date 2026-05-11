@@ -41,6 +41,10 @@ export default async function handler(req: any, res: any) {
       subPath = Buffer.from(encodedSubPath, 'base64').toString('utf-8');
     }
 
+    if (subPath.includes('..')) {
+      return res.status(400).json({ error: 'Invalid subpath' });
+    }
+
     const actualPrefix = `${basePrefix}${subPath}`;
 
     // 4. Fetch the actual contents of the requested folder
