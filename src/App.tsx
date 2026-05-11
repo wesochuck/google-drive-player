@@ -125,12 +125,7 @@ function App() {
 
   const isAtRoot = pathHistory[pathHistory.length - 1] === '';
 
-  const handleHome = () => {
-    if (!isAtRoot) {
-      setPathHistory(['']);
-      handleFetch(activeGuid, '');
-    }
-  };
+
 
   if (!activeGuid) {
     return (
@@ -214,8 +209,6 @@ function App() {
             }}
             onBack={handleBack}
             hasParentFolder={pathHistory.length > 1 && !isAtRoot}
-            onHome={handleHome}
-            isAtRoot={isAtRoot}
           />
         </main>
       )}
