@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { MediaFile } from '../services/blobService';
 import './Player.css';
 
@@ -62,15 +62,49 @@ export const Player: React.FC<PlayerProps> = ({
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playError, setPlayError] = useState<string | null>(null);
   const [isScrubbing, setIsScrubbing] = useState(false);
+  const [delaySetting, setDelaySetting] = useState<number>(0);
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [pendingNextIndex, setPendingNextIndex] = useState<number | null>(null);
+  const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Helper to clear countdown state
+  const cancelCountdown = useCallback(() => {
+    setCountdown(null);
+    setPendingNextIndex(null);
+    if (countdownTimerRef.current) {
+      clearTimeout(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+  }, []);
 
   const currentTrack = playlist[currentIndex];
   const isFolder = currentTrack?.isFolder || false;
   const firstAudioIndex = Math.max(0, playlist.findIndex(t => !t.isFolder));
 
   useEffect(() => {
+    cancelCountdown();
     setPlayError(null);
     setCurrentTime(0);
-  }, [currentIndex]);
+  }, [currentIndex, cancelCountdown]);
+
+  // The actual countdown timer effect
+  useEffect(() => {
+    if (countdown !== null && countdown > 0) {
+      countdownTimerRef.current = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+    } else if (countdown === 0 && pendingNextIndex !== null) {
+      // Countdown finished! Move to the next track.
+      const nextIdx = pendingNextIndex;
+      cancelCountdown();
+      onTrackChange(nextIdx);
+      setIsPlaying(true);
+    }
+    
+    return () => {
+      if (countdownTimerRef.current) clearTimeout(countdownTimerRef.current);
+    };
+  }, [countdown, pendingNextIndex, onTrackChange, setIsPlaying, cancelCountdown]);
 
   const safePlay = () => {
     if (audioRef.current) {
@@ -85,6 +119,15 @@ export const Player: React.FC<PlayerProps> = ({
   };
 
   const togglePlay = () => {
+    // If waiting on a countdown, skip the wait and play next track immediately
+    if (countdown !== null && pendingNextIndex !== null) {
+      const nextIdx = pendingNextIndex;
+      cancelCountdown();
+      onTrackChange(nextIdx);
+      setIsPlaying(true);
+      return;
+    }
+
     if (isPlaying) {
       audioRef.current?.pause();
       setIsPlaying(false);
@@ -95,21 +138,33 @@ export const Player: React.FC<PlayerProps> = ({
   };
 
   const handleEnded = () => {
+    const firstAudioIndex = Math.max(0, playlist.findIndex(t => !t.isFolder));
+    let nextIndexToPlay: number | null = null;
+
+    // Determine what the next track should be
     if (loopMode === 'one') {
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
         safePlay();
       }
+      return; 
     } else if (currentIndex < playlist.length - 1) {
-      // Move to next track and force playing state
-      onTrackChange(currentIndex + 1);
-      setIsPlaying(true); 
+      nextIndexToPlay = currentIndex + 1;
     } else if (loopMode === 'all') {
-      // Wrap to the first actual audio track and force playing state
-      onTrackChange(firstAudioIndex);
-      setIsPlaying(true); 
+      nextIndexToPlay = firstAudioIndex;
+    }
+
+    // Apply the delay or play immediately
+    if (nextIndexToPlay !== null) {
+      if (delaySetting > 0) {
+        setPendingNextIndex(nextIndexToPlay);
+        setCountdown(delaySetting);
+        setIsPlaying(false); // Pause while waiting
+      } else {
+        onTrackChange(nextIndexToPlay);
+        setIsPlaying(true);
+      }
     } else {
-      // Reached the end with no repeat
       setIsPlaying(false);
     }
   };
@@ -129,6 +184,7 @@ export const Player: React.FC<PlayerProps> = ({
   };
 
   const handlePrev = () => {
+    cancelCountdown();
     // FIX: Only go back if we are strictly past the first audio index
     if (currentIndex > firstAudioIndex) {
       onTrackChange(currentIndex - 1);
@@ -138,6 +194,7 @@ export const Player: React.FC<PlayerProps> = ({
   };
 
   const handleNext = () => {
+    cancelCountdown();
     if (currentIndex < playlist.length - 1) {
       onTrackChange(currentIndex + 1);
     } else if (loopMode === 'all') {
@@ -244,6 +301,19 @@ export const Player: React.FC<PlayerProps> = ({
       
       {playError && <div className="error-message" style={{ margin: '10px 0', padding: '10px', fontSize: '0.9rem' }}>{playError}</div>}
       
+      {/* COUNTDOWN OVERLAY */}
+      {countdown !== null && (
+        <div className="countdown-indicator">
+          <span>Next track starting in {countdown}s...</span>
+          <button 
+            onClick={togglePlay} 
+            className="skip-wait-button"
+          >
+            Skip Wait
+          </button>
+        </div>
+      )}
+
       <div className="progress-container">
         <span>{formatTime(currentTime)}</span>
         <input 
@@ -308,6 +378,21 @@ export const Player: React.FC<PlayerProps> = ({
           onChange={handleVolumeChange} 
           disabled={isFolder}
         />
+        
+        {/* NEW DELAY SETTING */}
+        <div className="delay-setting-container">
+          <label className="delay-label">Delay:</label>
+          <select 
+            value={delaySetting} 
+            onChange={(e) => setDelaySetting(Number(e.target.value))}
+            className="delay-select"
+          >
+            <option value={0}>None</option>
+            <option value={2}>2s</option>
+            <option value={5}>5s</option>
+            <option value={10}>10s</option>
+          </select>
+        </div>
       </div>
     </div>
   );
