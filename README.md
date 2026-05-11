@@ -1,59 +1,46 @@
-# Google Drive MP3 Player
+# Chorus Audio Player
 
-A lightweight, web-based MP3 player designed specifically for playing practice files directly from a public Google Drive folder.
+A secure, lightweight, web-based audio player designed for playing practice files and music libraries.
 
 ## Features
 
-- **Automatic Playlist:** Fetches all `.mp3` files from a specified Google Drive folder.
+- **Secure Access:** Uses a GUID-based authentication system to protect the root directory, ensuring privacy.
+- **Folder Navigation:** Supports nested directories with Base64-encoded subfolder URL paths to prevent casual URL tampering.
+- **Audio Playback:** Fetches and streams multiple audio formats (`.mp3`, `.wav`, `.ogg`, `.m4a`, `.aac`, `.flac`) directly from cloud storage.
 - **Continuous Playback:** Automatically advances to the next track.
 - **Looping Modes:** Supports "No Loop", "Loop All" (wraps around), and "Loop One" (repeats current track).
 - **Full Controls:** Play/Pause, Next/Prev, Volume slider, and Progress seek bar.
-- **Persistent Settings:** Saves your Google API Key and Folder ID to `localStorage` for convenience.
-- **Mobile Friendly:** Fully responsive design with a modern dark theme.
-
-## Prerequisites
-
-1. **Google API Key:** Create a project in the [Google Cloud Console](https://console.cloud.google.com/), enable the **Google Drive API**, and generate an API key.
-2. **Public Folder:** The Google Drive folder must be shared as **"Anyone with the link can view."**
-3. **Folder ID:** Obtain the Folder ID from the folder's URL (the string after `folders/`).
-
-## Getting Started
-
-### Installation
-
-```bash
-# Clone the repository
-git clone <repository-url>
-cd google-drive-player
-
-# Install dependencies
-npm install
-```
-
-### Development
-
-```bash
-npm run dev
-```
-
-### Build
-
-```bash
-npm run build
-```
+- **Theme Support:** Fully responsive design with automatic Light/Dark mode detection and a manual toggle.
 
 ## Usage
 
 1. Launch the application.
-2. Click the **Settings** icon/button.
-3. Enter your **Google API Key** and **Folder ID**.
-4. Click **Load Playlist**.
-5. Your MP3 files will appear in the list. Click any track to start playing.
+2. Enter your secure **Access Key** (GUID) when prompted on the access screen.
+3. Click **Access Player**.
+4. Navigate through folders or click any track to start playing.
+5. The URL will update dynamically as you navigate, allowing you to bookmark specific folders securely.
 
 ## Tech Stack
 
 - **Framework:** React 19 (TypeScript)
 - **Build Tool:** Vite
-- **API:** Google Drive API v3
+- **Storage/API:** Vercel Blob API
 - **Testing:** Vitest + React Testing Library
 - **Styling:** Vanilla CSS
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+## Build
+
+```bash
+# Build for production
+npm run build
+```
