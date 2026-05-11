@@ -79,9 +79,8 @@ function App() {
         return [...prev, rawSubPath];
       });
       updateUrl(guid, rawSubPath);
-    } catch (err) {
+    } catch {
       setError('Failed to fetch playlist or invalid access key.');
-      console.error(err);
     } finally {
       setIsLoading(false);
     }

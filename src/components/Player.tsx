@@ -112,7 +112,6 @@ export const Player: React.FC<PlayerProps> = ({
       if (playPromise !== undefined) {
         playPromise.catch(err => {
           if (err.name !== 'AbortError') {
-            console.error("Playback error:", err);
             setPlayError("Could not play this track. It may be unsupported.");
             setIsPlaying(false);
           }
@@ -292,8 +291,7 @@ export const Player: React.FC<PlayerProps> = ({
           onEnded={handleEnded}
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}
-          onError={(e) => {
-            console.error("Audio playback error:", e);
+          onError={() => {
             setPlayError("Could not load this track. It may be restricted or unsupported.");
             setIsPlaying(false);
           }}
