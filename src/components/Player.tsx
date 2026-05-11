@@ -64,7 +64,7 @@ export const Player: React.FC<PlayerProps> = ({
 
   const currentTrack = playlist[currentIndex];
   const isFolder = currentTrack?.isFolder || false;
-  const firstAudioIndex = playlist.findIndex(track => !track.isFolder);
+  const firstAudioIndex = Math.max(0, playlist.findIndex(t => !t.isFolder));
 
   useEffect(() => {
     setPlayError(null);
@@ -101,13 +101,8 @@ export const Player: React.FC<PlayerProps> = ({
     } else if (currentIndex < playlist.length - 1) {
       onTrackChange(currentIndex + 1);
     } else if (loopMode === 'all') {
-      const nextIndex = firstAudioIndex !== -1 ? firstAudioIndex : 0;
-      if (currentIndex === nextIndex && audioRef.current) {
-        audioRef.current.currentTime = 0;
-        safePlay();
-      } else {
-        onTrackChange(nextIndex);
-      }
+      // FIX: Wrap to the first audio file, skipping folders at the start
+      onTrackChange(firstAudioIndex);
     } else {
       setIsPlaying(false);
     }
@@ -128,7 +123,8 @@ export const Player: React.FC<PlayerProps> = ({
   };
 
   const handlePrev = () => {
-    if (currentIndex > firstAudioIndex && firstAudioIndex !== -1) {
+    // FIX: Only go back if we are strictly past the first audio index
+    if (currentIndex > firstAudioIndex) {
       onTrackChange(currentIndex - 1);
     } else if (loopMode === 'all') {
       onTrackChange(playlist.length - 1);
@@ -139,13 +135,8 @@ export const Player: React.FC<PlayerProps> = ({
     if (currentIndex < playlist.length - 1) {
       onTrackChange(currentIndex + 1);
     } else if (loopMode === 'all') {
-      const nextIndex = firstAudioIndex !== -1 ? firstAudioIndex : 0;
-      if (currentIndex === nextIndex && audioRef.current) {
-        audioRef.current.currentTime = 0;
-        safePlay();
-      } else {
-        onTrackChange(nextIndex);
-      }
+      // FIX: Wrap to the first audio file
+      onTrackChange(firstAudioIndex);
     }
   };
 
@@ -259,7 +250,8 @@ export const Player: React.FC<PlayerProps> = ({
         <div className="controls-center">
           <button 
             onClick={handlePrev} 
-            disabled={isFolder || (currentIndex <= firstAudioIndex && loopMode !== 'all')}
+            // FIX: Disable if it's the first audio track (and not repeating all)
+            disabled={isFolder || (currentIndex === firstAudioIndex && loopMode !== 'all')}
             aria-label="Previous"
           >
             <SkipPreviousIcon />
