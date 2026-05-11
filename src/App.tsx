@@ -4,12 +4,30 @@ import { Player } from './components/Player';
 import { Playlist } from './components/Playlist';
 import { fetchPlaylist, type MediaFile } from './services/blobService';
 
-function App() {
-  const [params] = useState(() => new URLSearchParams(window.location.search));
-  const urlPrefix = params.get('prefix') || '';
+const getPrefixFromPath = () => {
+  const path = window.location.pathname;
+  if (path === '/' || path === '') return '';
+  let prefix = path.substring(1);
+  if (!prefix.endsWith('/')) {
+    prefix += '/';
+  }
+  return prefix;
+};
 
-  const [currentPrefix, setCurrentPrefix] = useState(() => urlPrefix);
-  const [folderHistory, setFolderHistory] = useState<string[]>(() => urlPrefix ? [urlPrefix] : ['']);
+// Extract the base chorus from the initial URL prefix (e.g., 'lmc/2024/' -> 'lmc/')
+const getBaseChorus = (prefix: string) => {
+  if (!prefix) return '';
+  const parts = prefix.split('/');
+  return parts[0] + '/';
+};
+
+function App() {
+  const initialPrefix = getPrefixFromPath();
+
+  const [currentPrefix, setCurrentPrefix] = useState(() => initialPrefix);
+  const [baseChorus] = useState(() => getBaseChorus(initialPrefix));
+  const [folderHistory, setFolderHistory] = useState<string[]>(() => initialPrefix ? [initialPrefix] : ['']);
+  
   const [playlist, setPlaylist] = useState<MediaFile[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -18,11 +36,8 @@ function App() {
 
   const updateUrl = useCallback((prefix: string) => {
     const newUrl = new URL(window.location.href);
-    if (prefix) {
-      newUrl.searchParams.set('prefix', prefix);
-    } else {
-      newUrl.searchParams.delete('prefix');
-    }
+    newUrl.pathname = prefix ? `/${prefix}` : '/';
+    newUrl.searchParams.delete('prefix');
     window.history.pushState({}, '', newUrl);
   }, []);
 
@@ -57,9 +72,20 @@ function App() {
   useEffect(() => {
     if (!initialFetchDone.current) {
       initialFetchDone.current = true;
-      handleFetch(urlPrefix);
+      handleFetch(initialPrefix);
     }
-  }, [urlPrefix, handleFetch]);
+  }, [initialPrefix, handleFetch]);
+
+  // Handle browser back/forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      const pathPrefix = getPrefixFromPath();
+      setCurrentPrefix(pathPrefix);
+      handleFetch(pathPrefix);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [handleFetch]);
 
   const handleTrackSelect = (index: number) => {
     setCurrentIndex(index);
@@ -79,12 +105,12 @@ function App() {
     handleFetch(parentPrefix);
   };
 
-  const isAtRoot = currentPrefix === '';
+  const isAtRoot = currentPrefix === baseChorus;
 
   const handleHome = () => {
     if (!isAtRoot) {
-      setFolderHistory(['']);
-      handleFetch('');
+      setFolderHistory([baseChorus]);
+      handleFetch(baseChorus);
     }
   };
 
@@ -118,7 +144,7 @@ function App() {
             onTrackSelect={handleTrackSelect}
             onFolderSelect={handleFolderSelect}
             onBack={handleBack}
-            hasParentFolder={folderHistory.length > 1}
+            hasParentFolder={folderHistory.length > 1 && !isAtRoot}
             onHome={handleHome}
             isAtRoot={isAtRoot}
           />
