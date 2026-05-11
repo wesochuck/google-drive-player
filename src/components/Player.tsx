@@ -198,6 +198,7 @@ export const Player: React.FC<PlayerProps> = ({
     if (currentIndex < playlist.length - 1) {
       onTrackChange(currentIndex + 1);
     } else if (loopMode === 'all') {
+      // Wrap to the first audio file
       onTrackChange(firstAudioIndex);
     }
   };
