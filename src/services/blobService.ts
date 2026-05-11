@@ -5,6 +5,8 @@ export interface MediaFile {
   isFolder: boolean;
 }
 
+const AUDIO_FILE_REGEX = /\.(mp3|wav|ogg|m4a|aac|flac)$/i;
+
 export const fetchPlaylist = async (guid: string, encodedSubPath: string = ''): Promise<MediaFile[]> => {
   const url = `/api/blobs?guid=${encodeURIComponent(guid)}&subpath=${encodeURIComponent(encodedSubPath)}`;
   const response = await fetch(url);
@@ -32,7 +34,7 @@ export const fetchPlaylist = async (guid: string, encodedSubPath: string = ''): 
   if (data.blobs) {
     for (const blob of data.blobs) {
       const name = blob.pathname.replace(actualPrefix, '');
-      const isAudio = /\.(mp3|wav|ogg|m4a|aac|flac)$/i.test(name);
+      const isAudio = AUDIO_FILE_REGEX.test(name);
 
       if (!blob.pathname.endsWith('/') && isAudio) {
         mediaFiles.push({
