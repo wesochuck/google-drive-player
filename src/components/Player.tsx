@@ -188,7 +188,6 @@ export const Player: React.FC<PlayerProps> = ({
 
   const handlePrev = () => {
     cancelCountdown();
-    // FIX: Only go back if we are strictly past the first audio index
     if (currentIndex > firstAudioIndex) {
       onTrackChange(currentIndex - 1);
     } else if (loopMode === 'all') {
@@ -201,7 +200,6 @@ export const Player: React.FC<PlayerProps> = ({
     if (currentIndex < playlist.length - 1) {
       onTrackChange(currentIndex + 1);
     } else if (loopMode === 'all') {
-      // FIX: Wrap to the first audio file
       onTrackChange(firstAudioIndex);
     }
   };
@@ -340,7 +338,6 @@ export const Player: React.FC<PlayerProps> = ({
         <div className="controls-center">
           <button 
             onClick={handlePrev} 
-            // FIX: Disable if it's the first audio track (and not repeating all)
             disabled={isFolder || (currentIndex === firstAudioIndex && loopMode !== 'all')}
             aria-label="Previous"
           >
