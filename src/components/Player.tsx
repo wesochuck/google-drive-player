@@ -61,6 +61,7 @@ export const Player: React.FC<PlayerProps> = ({
   const [volume, setVolume] = useState(1);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playError, setPlayError] = useState<string | null>(null);
+  const [isScrubbing, setIsScrubbing] = useState(false);
 
   const currentTrack = playlist[currentIndex];
   const isFolder = currentTrack?.isFolder || false;
@@ -68,6 +69,7 @@ export const Player: React.FC<PlayerProps> = ({
 
   useEffect(() => {
     setPlayError(null);
+    setCurrentTime(0);
   }, [currentIndex]);
 
   const safePlay = () => {
@@ -177,7 +179,7 @@ export const Player: React.FC<PlayerProps> = ({
   }, [volume]);
 
   const handleTimeUpdate = () => {
-    if (audioRef.current) {
+    if (audioRef.current && !isScrubbing) {
       setCurrentTime(audioRef.current.currentTime);
     }
   };
@@ -188,12 +190,20 @@ export const Player: React.FC<PlayerProps> = ({
     }
   };
 
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const time = parseFloat(e.target.value);
-    setCurrentTime(time);
+  const handleSeekStart = () => {
+    setIsScrubbing(true);
+  };
+
+  const handleSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCurrentTime(parseFloat(e.target.value));
+  };
+
+  const handleSeekEnd = (e: React.MouseEvent<HTMLInputElement> | React.TouchEvent<HTMLInputElement>) => {
+    const time = parseFloat((e.target as HTMLInputElement).value);
     if (audioRef.current) {
       audioRef.current.currentTime = time;
     }
+    setIsScrubbing(false);
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -215,6 +225,7 @@ export const Player: React.FC<PlayerProps> = ({
         <audio 
           ref={audioRef} 
           src={currentTrack.streamUrl} 
+          preload="auto"
           autoPlay={isPlaying}
           onEnded={handleEnded}
           onPlay={() => setIsPlaying(true)}
@@ -239,7 +250,11 @@ export const Player: React.FC<PlayerProps> = ({
           max={duration || 0} 
           step="0.1"
           value={currentTime} 
-          onChange={handleSeek} 
+          onMouseDown={handleSeekStart}
+          onTouchStart={handleSeekStart}
+          onChange={handleSeekChange} 
+          onMouseUp={handleSeekEnd}
+          onTouchEnd={handleSeekEnd}
           className="seek-bar"
         />
         <span>{formatTime(duration)}</span>
