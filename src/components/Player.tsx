@@ -64,6 +64,7 @@ export const Player: React.FC<PlayerProps> = ({
 
   const currentTrack = playlist[currentIndex];
   const isFolder = currentTrack?.isFolder || false;
+  const firstAudioIndex = playlist.findIndex(track => !track.isFolder);
 
   useEffect(() => {
     setPlayError(null);
@@ -100,7 +101,7 @@ export const Player: React.FC<PlayerProps> = ({
     } else if (currentIndex < playlist.length - 1) {
       onTrackChange(currentIndex + 1);
     } else if (loopMode === 'all') {
-      onTrackChange(0);
+      onTrackChange(firstAudioIndex !== -1 ? firstAudioIndex : 0);
     } else {
       setIsPlaying(false);
     }
@@ -121,7 +122,7 @@ export const Player: React.FC<PlayerProps> = ({
   };
 
   const handlePrev = () => {
-    if (currentIndex > 0) {
+    if (currentIndex > firstAudioIndex && firstAudioIndex !== -1) {
       onTrackChange(currentIndex - 1);
     } else if (loopMode === 'all') {
       onTrackChange(playlist.length - 1);
@@ -132,7 +133,7 @@ export const Player: React.FC<PlayerProps> = ({
     if (currentIndex < playlist.length - 1) {
       onTrackChange(currentIndex + 1);
     } else if (loopMode === 'all') {
-      onTrackChange(0);
+      onTrackChange(firstAudioIndex !== -1 ? firstAudioIndex : 0);
     }
   };
 
@@ -245,7 +246,7 @@ export const Player: React.FC<PlayerProps> = ({
         <div className="controls-center">
           <button 
             onClick={handlePrev} 
-            disabled={isFolder || (currentIndex === 0 && loopMode !== 'all')}
+            disabled={isFolder || (currentIndex <= firstAudioIndex && loopMode !== 'all')}
             aria-label="Previous"
           >
             <SkipPreviousIcon />
@@ -260,7 +261,7 @@ export const Player: React.FC<PlayerProps> = ({
           </button>
           <button 
             onClick={handleNext} 
-            disabled={isFolder || (currentIndex === playlist.length - 1 && loopMode !== 'all')}
+            disabled={isFolder || (currentIndex >= playlist.length - 1 && loopMode !== 'all')}
             aria-label="Next"
           >
             <SkipNextIcon />
