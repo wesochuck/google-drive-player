@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import type { DriveFile } from '../services/driveService';
+import type { MediaFile } from '../services/blobService';
 import './Player.css';
 
 const PlayIcon = () => (
@@ -41,7 +41,7 @@ const RepeatOneIcon = () => (
 type LoopMode = 'none' | 'all' | 'one';
 
 interface PlayerProps {
-  playlist: DriveFile[];
+  playlist: MediaFile[];
   currentIndex: number;
   onTrackChange: (index: number) => void;
   isPlaying: boolean;
@@ -61,21 +61,12 @@ export const Player: React.FC<PlayerProps> = ({
   const [volume, setVolume] = useState(1);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [playError, setPlayError] = useState<string | null>(null);
-  const [blobUrl, setBlobUrl] = useState<string | null>(null);
-  const [fallbackUrl, setFallbackUrl] = useState<string | null>(null);
-  const [isFetchingBlob, setIsFetchingBlob] = useState(false);
 
   const currentTrack = playlist[currentIndex];
   const isFolder = currentTrack?.isFolder || false;
 
   useEffect(() => {
-    if (blobUrl) {
-      URL.revokeObjectURL(blobUrl);
-      setBlobUrl(null);
-    }
-    setFallbackUrl(null);
     setPlayError(null);
-    setIsFetchingBlob(false);
   }, [currentIndex]);
 
   const safePlay = () => {
@@ -83,7 +74,7 @@ export const Player: React.FC<PlayerProps> = ({
       audioRef.current.play().catch(err => {
         if (err.name !== 'AbortError') {
           console.error("Playback error:", err);
-          setPlayError("Could not play this track. It may be restricted or unsupported.");
+          setPlayError("Could not play this track. It may be unsupported.");
           setIsPlaying(false);
         }
       });
@@ -153,13 +144,13 @@ export const Player: React.FC<PlayerProps> = ({
         audioRef.current.pause();
       }
     }
-  }, [currentIndex, isPlaying, isFolder, blobUrl, fallbackUrl]);
+  }, [currentIndex, isPlaying, isFolder]);
 
   useEffect(() => {
     if ('mediaSession' in navigator && currentTrack) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: currentTrack.name,
-        artist: 'Google Drive Player',
+        artist: 'Vercel Audio Player',
       });
 
       navigator.mediaSession.setActionHandler('play', () => {
@@ -180,8 +171,6 @@ export const Player: React.FC<PlayerProps> = ({
       audioRef.current.volume = volume;
     }
   }, [volume]);
-
-
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
@@ -215,60 +204,22 @@ export const Player: React.FC<PlayerProps> = ({
 
   if (!currentTrack) return <div className="player empty">No track selected</div>;
 
-
-
   return (
     <div className="player">
       <h2>{currentTrack.name}</h2>
       {!isFolder && (
         <audio 
           ref={audioRef} 
-          src={fallbackUrl || blobUrl || currentTrack.streamUrl} 
+          src={currentTrack.streamUrl} 
           onEnded={handleEnded}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}
-          onError={async (e) => {
+          onError={(e) => {
             console.error("Audio playback error:", e);
-            if (fallbackUrl) {
-              setPlayError("Could not load this track. It may be restricted, or you need to log into Google Drive.");
-              setIsPlaying(false);
-              return;
-            }
-
-            if (!blobUrl && !isFetchingBlob && currentTrack && !isFolder) {
-              setIsFetchingBlob(true);
-              setPlayError("Bypassing mobile browser restrictions (secure download)...");
-              try {
-                const response = await fetch(currentTrack.streamUrl);
-                if (!response.ok) {
-                  const errText = await response.text();
-                  console.error("Fetch failed:", response.status, errText.substring(0, 200));
-                  throw new Error('Fetch failed with status: ' + response.status);
-                }
-                const blob = await response.blob();
-                if (blob.type.includes('text/html') || blob.type.includes('application/json')) {
-                  const errText = await blob.text();
-                  console.error("Invalid media blob:", blob.type, errText.substring(0, 200));
-                  throw new Error('Downloaded file is an error page, not audio.');
-                }
-                const objectUrl = URL.createObjectURL(blob);
-                setBlobUrl(objectUrl);
-                setPlayError(null);
-                setIsFetchingBlob(false);
-                if (isPlaying) safePlay();
-              } catch (err) {
-                console.error("Blob fetch failed, falling back to Google Drive cookie endpoint:", err);
-                const newFallback = `https://drive.google.com/uc?export=download&id=${currentTrack.id}`;
-                setFallbackUrl(newFallback);
-                setPlayError("Attempting alternative streaming method...");
-                setIsFetchingBlob(false);
-              }
-            } else if (!isFetchingBlob) {
-              setPlayError("Could not load this track. It may be restricted or unsupported.");
-              setIsPlaying(false);
-            }
+            setPlayError("Could not load this track. It may be restricted or unsupported.");
+            setIsPlaying(false);
           }}
         />
       )}

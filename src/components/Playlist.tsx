@@ -1,9 +1,9 @@
 import React from 'react';
-import type { DriveFile } from '../services/driveService';
+import type { MediaFile } from '../services/blobService';
 import './Playlist.css';
 
 interface PlaylistProps {
-  playlist: DriveFile[];
+  playlist: MediaFile[];
   currentIndex: number;
   onTrackSelect: (index: number) => void;
   onFolderSelect: (folderId: string) => void;

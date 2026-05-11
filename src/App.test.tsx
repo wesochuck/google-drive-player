@@ -11,15 +11,15 @@ describe('App component', () => {
     cleanup();
   });
 
-  test('renders Google Drive Player heading', () => {
+  test('renders Vercel Audio Player heading', () => {
     render(<App />)
-    const headingElement = screen.getByText(/Google Drive Player/i)
+    const headingElement = screen.getByText(/Vercel Audio Player/i)
     expect(headingElement).toBeInTheDocument()
   })
 
-  test('displays error message when URL parameters are missing', () => {
+  test('displays loading state initially', () => {
     render(<App />)
-    const errorElement = screen.getByText(/Configuration missing/i)
-    expect(errorElement).toBeInTheDocument()
+    const loadingElement = screen.getByText(/Loading playlist/i)
+    expect(loadingElement).toBeInTheDocument()
   })
 })
