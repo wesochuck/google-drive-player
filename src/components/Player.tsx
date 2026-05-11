@@ -101,11 +101,15 @@ export const Player: React.FC<PlayerProps> = ({
         safePlay();
       }
     } else if (currentIndex < playlist.length - 1) {
+      // Move to next track and force playing state
       onTrackChange(currentIndex + 1);
+      setIsPlaying(true); 
     } else if (loopMode === 'all') {
-      // FIX: Wrap to the first audio file, skipping folders at the start
+      // Wrap to the first actual audio track and force playing state
       onTrackChange(firstAudioIndex);
+      setIsPlaying(true); 
     } else {
+      // Reached the end with no repeat
       setIsPlaying(false);
     }
   };
@@ -228,8 +232,6 @@ export const Player: React.FC<PlayerProps> = ({
           preload="auto"
           autoPlay={isPlaying}
           onEnded={handleEnded}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}
           onError={(e) => {
