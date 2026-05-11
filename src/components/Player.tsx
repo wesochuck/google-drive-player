@@ -65,7 +65,7 @@ export const Player: React.FC<PlayerProps> = ({
   const [delaySetting, setDelaySetting] = useState<number>(0);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [pendingNextIndex, setPendingNextIndex] = useState<number | null>(null);
-  const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Helper to clear countdown state
   const cancelCountdown = useCallback(() => {
@@ -108,13 +108,16 @@ export const Player: React.FC<PlayerProps> = ({
 
   const safePlay = () => {
     if (audioRef.current) {
-      audioRef.current.play().catch(err => {
-        if (err.name !== 'AbortError') {
-          console.error("Playback error:", err);
-          setPlayError("Could not play this track. It may be unsupported.");
-          setIsPlaying(false);
-        }
-      });
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(err => {
+          if (err.name !== 'AbortError') {
+            console.error("Playback error:", err);
+            setPlayError("Could not play this track. It may be unsupported.");
+            setIsPlaying(false);
+          }
+        });
+      }
     }
   };
 
@@ -381,8 +384,9 @@ export const Player: React.FC<PlayerProps> = ({
         
         {/* NEW DELAY SETTING */}
         <div className="delay-setting-container">
-          <label className="delay-label">Delay:</label>
+          <label htmlFor="delay-select" className="delay-label">Delay:</label>
           <select 
+            id="delay-select"
             value={delaySetting} 
             onChange={(e) => setDelaySetting(Number(e.target.value))}
             className="delay-select"
