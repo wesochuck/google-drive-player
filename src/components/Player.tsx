@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import type { MediaFile } from '../services/blobService';
 import './Player.css';
 
@@ -79,7 +79,7 @@ export const Player: React.FC<PlayerProps> = ({
 
   const currentTrack = playlist[currentIndex];
   const isFolder = currentTrack?.isFolder || false;
-  const firstAudioIndex = Math.max(0, playlist.findIndex(t => !t.isFolder));
+  const firstAudioIndex = useMemo(() => Math.max(0, playlist.findIndex(t => !t.isFolder)), [playlist]);
 
   useEffect(() => {
     cancelCountdown();
@@ -141,7 +141,6 @@ export const Player: React.FC<PlayerProps> = ({
   };
 
   const handleEnded = () => {
-    const firstAudioIndex = Math.max(0, playlist.findIndex(t => !t.isFolder));
     let nextIndexToPlay: number | null = null;
 
     // Determine what the next track should be
