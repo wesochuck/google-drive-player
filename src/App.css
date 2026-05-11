@@ -1,4 +1,21 @@
 :root {
+  /* Light Theme (Default) */
+  --bg-color: #f3f4f6;
+  --card-bg: #ffffff;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --accent-color: #4f46e5;
+  --accent-hover: #4338ca;
+  --error-color: #ef4444;
+  --border-color: #e5e7eb;
+  --hover-bg: #f9fafb;
+  --active-bg: #eef2ff;
+  --container-width: 800px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] {
   --bg-color: #0f0f0f;
   --card-bg: #1a1a1a;
   --text-primary: #ffffff;
@@ -6,13 +23,17 @@
   --accent-color: #646cff;
   --accent-hover: #747bff;
   --error-color: #ff4d4d;
-  --container-width: 800px;
+  --border-color: #333333;
+  --hover-bg: #2a2a2a;
+  --active-bg: #3730a3;
+  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 body {
   background-color: var(--bg-color);
   color: var(--text-primary);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .container {
@@ -45,8 +66,10 @@ h1 {
   background: var(--card-bg);
   border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-md);
   margin-bottom: 2rem;
+  border: 1px solid var(--border-color);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .setup h2 {
@@ -112,10 +135,10 @@ h1 {
   cursor: not-allowed;
 }
 
-.settings-toggle {
-  background: rgba(255, 255, 255, 0.05);
-  border: none;
-  color: white;
+.theme-toggle {
+  background: var(--hover-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -124,22 +147,24 @@ h1 {
   justify-content: center;
   cursor: pointer;
   font-size: 1.2rem;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
-.settings-toggle:hover {
-  background: rgba(255, 255, 255, 0.1);
+.theme-toggle:hover {
+  background: var(--border-color);
+  transform: scale(1.1);
 }
 
 .error-message {
-  background: rgba(255, 77, 77, 0.1);
+  background: var(--hover-bg);
   color: var(--error-color);
-  padding: 1rem;
+  padding: 1.5rem;
   border-radius: 8px;
-  margin-bottom: 2rem;
-  font-size: 0.9rem;
+  margin: 2rem 0;
+  font-size: 0.95rem;
   text-align: center;
-  border: 1px solid rgba(255, 77, 77, 0.2);
+  border: 1px solid var(--error-color);
+  box-shadow: var(--shadow-sm);
 }
 
 .help-text {

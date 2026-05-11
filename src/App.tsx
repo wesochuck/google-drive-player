@@ -33,6 +33,20 @@ function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = localStorage.getItem('app-theme');
+    if (saved === 'light' || saved === 'dark') return saved;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('app-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
 
   const updateUrl = useCallback((prefix: string) => {
     const newUrl = new URL(window.location.href);
@@ -118,10 +132,17 @@ function App() {
     <div className="container">
       <header>
         <h1>Chorus Audio Player</h1>
+        <button 
+          onClick={toggleTheme} 
+          className="theme-toggle"
+          aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+        >
+          {theme === 'light' ? '🌙' : '☀️'}
+        </button>
       </header>
 
       {error && (
-        <div className="error-message" style={{ margin: '2rem 0', padding: '1.5rem', background: 'rgba(255, 50, 50, 0.1)', border: '1px solid rgba(255, 50, 50, 0.3)', borderRadius: '8px' }}>
+        <div className="error-message">
           <p>{error}</p>
         </div>
       )}

@@ -2,11 +2,13 @@
   background: var(--card-bg);
   border-radius: 16px;
   padding: 1rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-md);
   margin-bottom: 1.5rem;
   text-align: center;
   min-width: 0;
   width: 100%;
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
 }
 
 .player.empty {
@@ -39,7 +41,7 @@
   flex-grow: 1;
   height: 4px;
   -webkit-appearance: none;
-  background: color-mix(in srgb, var(--text-primary), transparent 90%);
+  background: var(--border-color);
   border-radius: 2px;
   outline: none;
   cursor: pointer;
@@ -80,9 +82,9 @@
 }
 
 .controls button {
-  background: color-mix(in srgb, var(--text-primary), transparent 95%);
-  border: none;
-  color: white;
+  background: var(--hover-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
   width: 48px;
   height: 48px;
   padding: 0;
@@ -95,7 +97,8 @@
 }
 
 .controls button:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--text-primary), transparent 90%);
+  background: var(--border-color);
+  transform: translateY(-2px);
 }
 
 .controls button:disabled {
@@ -105,9 +108,11 @@
 
 .controls .play-button {
   background: var(--accent-color);
+  color: #ffffff;
   width: 64px;
   height: 64px;
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-color), transparent 70%);
+  box-shadow: var(--shadow-sm);
+  border: none;
 }
 
 .controls .play-button:hover {
@@ -133,8 +138,8 @@
 
 .repeat-button.all, .repeat-button.one {
   color: var(--accent-color);
-  background: color-mix(in srgb, var(--accent-color), transparent 85%);
-  border: 1px solid color-mix(in srgb, var(--accent-color), transparent 70%);
+  background: var(--active-bg);
+  border: 1px solid var(--accent-color);
 }
 
 .volume-container {
@@ -155,7 +160,7 @@
   flex-grow: 1;
   height: 4px;
   -webkit-appearance: none;
-  background: color-mix(in srgb, var(--text-primary), transparent 90%);
+  background: var(--border-color);
   border-radius: 2px;
   outline: none;
 }

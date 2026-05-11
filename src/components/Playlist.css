@@ -1,10 +1,13 @@
 .playlist {
   margin-top: 2rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--card-bg);
   border-radius: 12px;
   padding: 1rem;
   max-height: 400px;
   overflow-y: auto;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
 }
 
 .playlist h3 {
@@ -12,7 +15,7 @@
   margin-bottom: 1rem;
   color: var(--accent-color);
   font-size: 1.2rem;
-  border-bottom: 1px solid rgba(100, 108, 255, 0.2);
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.5rem;
 }
 
@@ -35,16 +38,17 @@
 }
 
 .playlist li:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--hover-bg);
 }
 
 .playlist li.active {
-  background: var(--accent-color);
-  color: white;
+  background: var(--active-bg);
+  color: var(--accent-color);
+  font-weight: 600;
 }
 
 .playlist li.active .track-number {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--accent-color);
 }
 
 .track-number {
@@ -70,10 +74,16 @@
 }
 
 .playlist::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border-color);
   border-radius: 3px;
 }
 
 .playlist::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--text-secondary);
+}
+
+.back-item {
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
 }
