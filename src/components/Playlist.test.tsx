@@ -36,8 +36,6 @@ describe('Playlist', () => {
 
     expect(screen.getByText('Track 1')).toBeInTheDocument();
     expect(screen.getByText('Track 2')).toBeInTheDocument();
-    expect(screen.getByText('1.')).toBeInTheDocument();
-    expect(screen.getByText('2.')).toBeInTheDocument();
   });
 
   it('highlights the current track', () => {

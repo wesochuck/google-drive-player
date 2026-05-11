@@ -47,7 +47,7 @@ export const Playlist: React.FC<PlaylistProps> = ({
             className={`${index === currentIndex && !item.isFolder ? 'active' : ''} ${item.isFolder ? 'folder' : ''}`}
             onClick={() => item.isFolder ? onFolderSelect(item.id) : onTrackSelect(index)}
           >
-            <span className="track-number">{item.isFolder ? '📁' : (index + 1 + '.')}</span>
+            <span className="track-number">{item.isFolder ? '📁' : '🎵'}</span>
             <span className="track-name">{item.name}</span>
           </li>
         ))}
