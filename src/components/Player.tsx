@@ -101,7 +101,13 @@ export const Player: React.FC<PlayerProps> = ({
     } else if (currentIndex < playlist.length - 1) {
       onTrackChange(currentIndex + 1);
     } else if (loopMode === 'all') {
-      onTrackChange(firstAudioIndex !== -1 ? firstAudioIndex : 0);
+      const nextIndex = firstAudioIndex !== -1 ? firstAudioIndex : 0;
+      if (currentIndex === nextIndex && audioRef.current) {
+        audioRef.current.currentTime = 0;
+        safePlay();
+      } else {
+        onTrackChange(nextIndex);
+      }
     } else {
       setIsPlaying(false);
     }
@@ -133,7 +139,13 @@ export const Player: React.FC<PlayerProps> = ({
     if (currentIndex < playlist.length - 1) {
       onTrackChange(currentIndex + 1);
     } else if (loopMode === 'all') {
-      onTrackChange(firstAudioIndex !== -1 ? firstAudioIndex : 0);
+      const nextIndex = firstAudioIndex !== -1 ? firstAudioIndex : 0;
+      if (currentIndex === nextIndex && audioRef.current) {
+        audioRef.current.currentTime = 0;
+        safePlay();
+      } else {
+        onTrackChange(nextIndex);
+      }
     }
   };
 
@@ -212,6 +224,7 @@ export const Player: React.FC<PlayerProps> = ({
         <audio 
           ref={audioRef} 
           src={currentTrack.streamUrl} 
+          autoPlay={isPlaying}
           onEnded={handleEnded}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}

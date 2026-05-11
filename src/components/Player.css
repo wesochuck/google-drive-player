@@ -75,7 +75,7 @@
 
 .controls {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   margin-bottom: 1.5rem;
   width: 100%;
@@ -90,8 +90,7 @@
 
 .controls-right {
   display: flex;
-  justify-content: flex-start;
-  padding-left: 1rem;
+  justify-content: flex-end;
 }
 
 .controls button {
