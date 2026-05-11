@@ -155,6 +155,23 @@ h1 {
   transform: scale(1.1);
 }
 
+.access-prompt {
+  max-width: 400px;
+  margin: 4rem auto;
+  text-align: center;
+}
+
+.access-prompt h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+}
+
+.access-prompt .input-group {
+  margin-bottom: 1.5rem;
+}
+
 .error-message {
   background: var(--hover-bg);
   color: var(--error-color);

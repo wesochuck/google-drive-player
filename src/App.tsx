@@ -4,35 +4,38 @@ import { Player } from './components/Player';
 import { Playlist } from './components/Playlist';
 import { fetchPlaylist, type MediaFile } from './services/blobService';
 
-const getPrefixFromPath = () => {
-  const path = window.location.pathname;
-  if (path === '/' || path === '') return '';
-  let prefix = path.substring(1);
-  if (!prefix.endsWith('/')) {
-    prefix += '/';
-  }
-  return prefix;
+const parseUrlParams = () => {
+  const path = window.location.pathname.replace(/^\//, ''); // Remove leading slash
+  if (!path) return { guid: '', encodedSubPath: '' };
+  
+  const parts = path.split('/');
+  const guid = parts[0];
+  const encodedSubPath = parts[1] || '';
+  
+  return { guid, encodedSubPath };
 };
 
-// Extract the base chorus from the initial URL prefix (e.g., 'lmc/2024/' -> 'lmc/')
-const getBaseChorus = (prefix: string) => {
-  if (!prefix) return '';
-  const parts = prefix.split('/');
-  return parts[0] + '/';
+const buildObscuredUrl = (guid: string, rawSubPath: string) => {
+  if (!rawSubPath) return `/${guid}`;
+  const encoded = btoa(rawSubPath);
+  return `/${guid}/${encoded}`;
 };
 
 function App() {
-  const initialPrefix = getPrefixFromPath();
-
-  const [currentPrefix, setCurrentPrefix] = useState(() => initialPrefix);
-  const [baseChorus] = useState(() => getBaseChorus(initialPrefix));
-  const [folderHistory, setFolderHistory] = useState<string[]>(() => initialPrefix ? [initialPrefix] : ['']);
+  const initialParams = parseUrlParams();
+  
+  const [activeGuid, setActiveGuid] = useState(initialParams.guid);
+  // Store raw subpaths in history, encode them only for the URL
+  const [pathHistory, setPathHistory] = useState<string[]>(() => {
+    return initialParams.encodedSubPath ? [atob(initialParams.encodedSubPath)] : [''];
+  });
   
   const [playlist, setPlaylist] = useState<MediaFile[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const saved = localStorage.getItem('app-theme');
     if (saved === 'light' || saved === 'dark') return saved;
@@ -48,18 +51,21 @@ function App() {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
 
-  const updateUrl = useCallback((prefix: string) => {
+  const updateUrl = useCallback((guid: string, rawSubPath: string) => {
     const newUrl = new URL(window.location.href);
-    newUrl.pathname = prefix ? `/${prefix}` : '/';
-    newUrl.searchParams.delete('prefix');
+    newUrl.pathname = buildObscuredUrl(guid, rawSubPath);
+    newUrl.searchParams.delete('prefix'); // Clean up old URLs
     window.history.pushState({}, '', newUrl);
   }, []);
 
-  const handleFetch = useCallback(async (prefix: string) => {
+  const handleFetch = useCallback(async (guid: string, rawSubPath: string) => {
+    if (!guid) return;
+    
     try {
       setIsLoading(true);
       setError(null);
-      const files = await fetchPlaylist(prefix);
+      const encodedSubPath = rawSubPath ? btoa(rawSubPath) : '';
+      const files = await fetchPlaylist(guid, encodedSubPath);
       
       setPlaylist(files);
       
@@ -67,14 +73,14 @@ function App() {
       setCurrentIndex(firstAudioIndex !== -1 ? firstAudioIndex : 0);
       setIsPlaying(false);
       
-      setCurrentPrefix(prefix);
-      setFolderHistory(prev => {
-        if (prev[prev.length - 1] === prefix) return prev;
-        return [...prev, prefix];
+      setActiveGuid(guid);
+      setPathHistory(prev => {
+        if (prev[prev.length - 1] === rawSubPath) return prev;
+        return [...prev, rawSubPath];
       });
-      updateUrl(prefix);
+      updateUrl(guid, rawSubPath);
     } catch (err) {
-      setError('Failed to fetch playlist from Vercel Blob.');
+      setError('Failed to fetch playlist or invalid access key.');
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -84,18 +90,20 @@ function App() {
   const initialFetchDone = useRef(false);
 
   useEffect(() => {
-    if (!initialFetchDone.current) {
+    if (!initialFetchDone.current && initialParams.guid) {
       initialFetchDone.current = true;
-      handleFetch(initialPrefix);
+      const rawSubPath = initialParams.encodedSubPath ? atob(initialParams.encodedSubPath) : '';
+      handleFetch(initialParams.guid, rawSubPath);
     }
-  }, [initialPrefix, handleFetch]);
+  }, [initialParams.guid, initialParams.encodedSubPath, handleFetch]);
 
   // Handle browser back/forward navigation
   useEffect(() => {
     const handlePopState = () => {
-      const pathPrefix = getPrefixFromPath();
-      setCurrentPrefix(pathPrefix);
-      handleFetch(pathPrefix);
+      const params = parseUrlParams();
+      setActiveGuid(params.guid);
+      const rawSubPath = params.encodedSubPath ? atob(params.encodedSubPath) : '';
+      handleFetch(params.guid, rawSubPath);
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
@@ -106,27 +114,59 @@ function App() {
     setIsPlaying(true);
   };
 
-  const handleFolderSelect = (newPrefix: string) => {
-    handleFetch(newPrefix);
-  };
-
   const handleBack = () => {
-    if (folderHistory.length <= 1) return;
-    const newHistory = [...folderHistory];
+    if (pathHistory.length <= 1) return;
+    const newHistory = [...pathHistory];
     newHistory.pop(); // remove current
-    const parentPrefix = newHistory[newHistory.length - 1];
-    setFolderHistory(newHistory);
-    handleFetch(parentPrefix);
+    const parentSubPath = newHistory[newHistory.length - 1];
+    setPathHistory(newHistory);
+    handleFetch(activeGuid, parentSubPath);
   };
 
-  const isAtRoot = currentPrefix === baseChorus;
+  const isAtRoot = pathHistory[pathHistory.length - 1] === '';
 
   const handleHome = () => {
     if (!isAtRoot) {
-      setFolderHistory([baseChorus]);
-      handleFetch(baseChorus);
+      setPathHistory(['']);
+      handleFetch(activeGuid, '');
     }
   };
+
+  if (!activeGuid) {
+    return (
+      <div className="container">
+        <header>
+          <h1>Chorus Audio Player</h1>
+          <button 
+            onClick={toggleTheme} 
+            className="theme-toggle"
+            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          >
+            {theme === 'light' ? '🌙' : '☀️'}
+          </button>
+        </header>
+        <div className="access-prompt card">
+          <h2>Enter Access Key</h2>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            const form = e.target as HTMLFormElement;
+            const input = form.elements.namedItem('guid') as HTMLInputElement;
+            const newGuid = input.value.trim();
+            if (newGuid) {
+              setActiveGuid(newGuid);
+              window.history.pushState({}, '', `/${newGuid}`);
+              handleFetch(newGuid, '');
+            }
+          }}>
+            <div className="input-group">
+              <input type="text" name="guid" placeholder="e.g., 912baeb0..." required />
+            </div>
+            <button type="submit" className="primary-button">Access Player</button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container">
@@ -163,9 +203,17 @@ function App() {
             playlist={playlist} 
             currentIndex={currentIndex} 
             onTrackSelect={handleTrackSelect}
-            onFolderSelect={handleFolderSelect}
+            onFolderSelect={(id) => {
+              // Extract the relative name from the playlist item
+              const item = playlist.find(p => p.id === id);
+              if (item) {
+                const currentSubPath = pathHistory[pathHistory.length - 1] || '';
+                const newSubPath = currentSubPath + item.name + '/';
+                handleFetch(activeGuid, newSubPath);
+              }
+            }}
             onBack={handleBack}
-            hasParentFolder={folderHistory.length > 1 && !isAtRoot}
+            hasParentFolder={pathHistory.length > 1 && !isAtRoot}
             onHome={handleHome}
             isAtRoot={isAtRoot}
           />

@@ -17,9 +17,9 @@ describe('App component', () => {
     expect(headingElement).toBeInTheDocument()
   })
 
-  test('displays loading state initially', () => {
+  test('displays access prompt initially', () => {
     render(<App />)
-    const loadingElement = screen.getByText(/Loading playlist/i)
-    expect(loadingElement).toBeInTheDocument()
+    const promptElement = screen.getByText(/Enter Access Key/i)
+    expect(promptElement).toBeInTheDocument()
   })
 })
