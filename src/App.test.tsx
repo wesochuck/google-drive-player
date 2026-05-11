@@ -11,9 +11,9 @@ describe('App component', () => {
     cleanup();
   });
 
-  test('renders Vercel Audio Player heading', () => {
+  test('renders Chorus Audio Player heading', () => {
     render(<App />)
-    const headingElement = screen.getByText(/Vercel Audio Player/i)
+    const headingElement = screen.getByText(/Chorus Audio Player/i)
     expect(headingElement).toBeInTheDocument()
   })
 

@@ -150,7 +150,7 @@ export const Player: React.FC<PlayerProps> = ({
     if ('mediaSession' in navigator && currentTrack) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: currentTrack.name,
-        artist: 'Vercel Audio Player',
+        artist: 'Chorus Audio Player',
       });
 
       navigator.mediaSession.setActionHandler('play', () => {
@@ -241,31 +241,37 @@ export const Player: React.FC<PlayerProps> = ({
       </div>
 
       <div className="controls">
-        <button 
-          onClick={handlePrev} 
-          disabled={isFolder || (currentIndex === 0 && loopMode !== 'all')}
-          aria-label="Previous"
-        >
-          <SkipPreviousIcon />
-        </button>
-        <button 
-          onClick={togglePlay}
-          disabled={isFolder}
-          aria-label={isPlaying ? 'Pause' : 'Play'}
-        >
-          {isPlaying ? <PauseIcon /> : <PlayIcon />}
-        </button>
-        <button 
-          onClick={handleNext} 
-          disabled={isFolder || (currentIndex === playlist.length - 1 && loopMode !== 'all')}
-          aria-label="Next"
-        >
-          <SkipNextIcon />
-        </button>
-        <button onClick={cycleLoopMode} className={`repeat-button ${loopMode}`} disabled={isFolder}>
-          {loopMode === 'one' ? <RepeatOneIcon /> : <RepeatIcon />}
-          <span>{getRepeatLabel()}</span>
-        </button>
+        <div className="controls-left"></div>
+        <div className="controls-center">
+          <button 
+            onClick={handlePrev} 
+            disabled={isFolder || (currentIndex === 0 && loopMode !== 'all')}
+            aria-label="Previous"
+          >
+            <SkipPreviousIcon />
+          </button>
+          <button 
+            className="play-button"
+            onClick={togglePlay}
+            disabled={isFolder}
+            aria-label={isPlaying ? 'Pause' : 'Play'}
+          >
+            {isPlaying ? <PauseIcon /> : <PlayIcon />}
+          </button>
+          <button 
+            onClick={handleNext} 
+            disabled={isFolder || (currentIndex === playlist.length - 1 && loopMode !== 'all')}
+            aria-label="Next"
+          >
+            <SkipNextIcon />
+          </button>
+        </div>
+        <div className="controls-right">
+          <button onClick={cycleLoopMode} className={`repeat-button ${loopMode}`} disabled={isFolder}>
+            {loopMode === 'one' ? <RepeatOneIcon /> : <RepeatIcon />}
+            <span>{getRepeatLabel()}</span>
+          </button>
+        </div>
       </div>
 
       <div className="volume-container">

@@ -59,12 +59,24 @@
 }
 
 .controls {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.controls-center {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
+}
+
+.controls-right {
+  display: flex;
+  justify-content: flex-start;
+  padding-left: 1rem;
 }
 
 .controls button {
@@ -91,14 +103,14 @@
   cursor: not-allowed;
 }
 
-.controls button:nth-child(2) {
+.controls .play-button {
   background: var(--accent-color);
   width: 64px;
   height: 64px;
   box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-color), transparent 70%);
 }
 
-.controls button:nth-child(2):hover {
+.controls .play-button:hover {
   background: var(--accent-hover);
   transform: scale(1.05);
 }

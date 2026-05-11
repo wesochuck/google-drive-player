@@ -91,7 +91,7 @@ function App() {
   return (
     <div className="container">
       <header>
-        <h1>Vercel Audio Player</h1>
+        <h1>Chorus Audio Player</h1>
       </header>
 
       {error && (
