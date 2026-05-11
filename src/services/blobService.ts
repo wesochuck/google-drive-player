@@ -31,8 +31,10 @@ export const fetchPlaylist = async (prefix: string = ''): Promise<MediaFile[]> =
   // Add files
   if (data.blobs) {
     for (const blob of data.blobs) {
-      if (!blob.pathname.endsWith('/')) { // Ignore purely folder blobs
-        const name = blob.pathname.replace(prefix, '');
+      const name = blob.pathname.replace(prefix, '');
+      const isAudio = /\.(mp3|wav|ogg|m4a|aac|flac)$/i.test(name);
+
+      if (!blob.pathname.endsWith('/') && isAudio) {
         mediaFiles.push({
           id: blob.pathname,
           name: name,
