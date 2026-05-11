@@ -1,10 +1,11 @@
 import { list } from '@vercel/blob';
 import crypto from 'crypto';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-export default async function handler(req: any, res: any) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    const accessKey = req.query.guid; // keeping the parameter name as guid for frontend compatibility
-    const encodedSubPath = req.query.subpath || '';
+    const accessKey = req.query.guid as string; // keeping the parameter name as guid for frontend compatibility
+    const encodedSubPath = (req.query.subpath as string) || '';
 
     if (!accessKey) {
       return res.status(401).json({ error: 'Access key is required' });
