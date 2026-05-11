@@ -188,7 +188,7 @@ export const Player: React.FC<PlayerProps> = ({
     cancelCountdown();
     if (currentIndex > firstAudioIndex) {
       onTrackChange(currentIndex - 1);
-    } else if (loopMode === 'all') {
+    } else if (currentIndex === firstAudioIndex && loopMode === 'all') {
       onTrackChange(playlist.length - 1);
     }
   };
