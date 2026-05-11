@@ -49,15 +49,28 @@
 
 .seek-bar::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 12px;
-  height: 12px;
+  width: 24px;
+  height: 24px;
+  background: var(--accent-color);
+  border-radius: 50%;
+  transition: transform 0.1s;
+}
+
+.seek-bar::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border: none;
   background: var(--accent-color);
   border-radius: 50%;
   transition: transform 0.1s;
 }
 
 .seek-bar::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
+  transform: scale(1.1);
+}
+
+.seek-bar::-moz-range-thumb:hover {
+  transform: scale(1.1);
 }
 
 .controls {
@@ -218,5 +231,15 @@
 
   .volume-container {
     display: flex;
+  }
+
+  .seek-bar::-webkit-slider-thumb {
+    width: 16px;
+    height: 16px;
+  }
+
+  .seek-bar::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
   }
 }
