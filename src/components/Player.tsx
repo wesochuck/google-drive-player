@@ -65,6 +65,9 @@ export const Player: React.FC<PlayerProps> = ({
   const [delaySetting, setDelaySetting] = useState<number>(0);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [pendingNextIndex, setPendingNextIndex] = useState<number | null>(null);
+  const [skipStart, setSkipStart] = useState<number>(0);
+  const [showSkipNotify, setShowSkipNotify] = useState(false);
+  const hasAppliedSkipRef = useRef<boolean>(false);
   const countdownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Helper to clear countdown state
@@ -85,7 +88,14 @@ export const Player: React.FC<PlayerProps> = ({
     cancelCountdown();
     setPlayError(null);
     setCurrentTime(0);
-  }, [currentIndex, cancelCountdown]);
+    
+    // Load skip setting for this specific track
+    if (currentTrack?.id) {
+      const saved = localStorage.getItem(`track_skip_${currentTrack.id}`);
+      setSkipStart(saved ? parseFloat(saved) : 0);
+      hasAppliedSkipRef.current = false;
+    }
+  }, [currentIndex, currentTrack?.id, cancelCountdown]);
 
   // The actual countdown timer effect
   useEffect(() => {
@@ -248,6 +258,14 @@ export const Player: React.FC<PlayerProps> = ({
   const handleLoadedMetadata = () => {
     if (audioRef.current) {
       setDuration(audioRef.current.duration);
+      
+      // Automatically skip the first N seconds if configured
+      if (!hasAppliedSkipRef.current && skipStart > 0 && audioRef.current.currentTime < skipStart) {
+        audioRef.current.currentTime = Math.min(skipStart, audioRef.current.duration - 1);
+        hasAppliedSkipRef.current = true;
+        setShowSkipNotify(true);
+        setTimeout(() => setShowSkipNotify(false), 3000);
+      }
     }
   };
 
@@ -269,6 +287,14 @@ export const Player: React.FC<PlayerProps> = ({
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setVolume(parseFloat(e.target.value));
+  };
+
+  const handleSkipStartChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseFloat(e.target.value) || 0;
+    setSkipStart(val);
+    if (currentTrack?.id) {
+      localStorage.setItem(`track_skip_${currentTrack.id}`, val.toString());
+    }
   };
 
   const formatTime = (time: number) => {
@@ -310,6 +336,14 @@ export const Player: React.FC<PlayerProps> = ({
           >
             Skip Wait
           </button>
+        </div>
+      )}
+
+      {/* SKIP NOTIFICATION */}
+      {showSkipNotify && (
+        <div className="countdown-indicator" style={{ background: 'var(--hover-bg)', borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}>
+          <span>Skipped first {skipStart}s of track</span>
+          <button onClick={() => setShowSkipNotify(false)} className="skip-wait-button" style={{ background: 'var(--border-color)', color: 'var(--text-primary)' }}>Dismiss</button>
         </div>
       )}
 
@@ -391,6 +425,22 @@ export const Player: React.FC<PlayerProps> = ({
             <option value={5}>5s</option>
             <option value={10}>10s</option>
           </select>
+        </div>
+
+        {/* SKIP START SETTING */}
+        <div className="skip-setting-container">
+          <label htmlFor="skip-input" className="delay-label">Skip First:</label>
+          <input 
+            id="skip-input"
+            type="number" 
+            min="0"
+            step="0.1"
+            value={skipStart || ''} 
+            onChange={handleSkipStartChange}
+            placeholder="0"
+            className="skip-input"
+          />
+          <span className="unit-label">s</span>
         </div>
       </div>
     </div>
