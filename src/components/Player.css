@@ -159,8 +159,8 @@
   align-items: center;
   gap: 1rem;
   justify-content: center;
-  max-width: 250px;
-  margin: 0 auto;
+  max-width: 450px;
+  margin: 0.5rem auto 0;
 }
 
 .volume-container label {
@@ -281,11 +281,11 @@
 }
 
 .skip-setting-container {
-  margin-left: 1rem;
+  margin-right: auto;
 }
 
 .skip-input {
-  width: 50px;
+  width: 60px;
   padding: 0.3rem 0.4rem;
   border-radius: 8px;
   background-color: var(--hover-bg);
@@ -295,6 +295,16 @@
   outline: none;
   transition: all 0.2s;
   text-align: center;
+}
+
+.skip-input::-webkit-inner-spin-button,
+.skip-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.skip-input {
+  -moz-appearance: textfield;
 }
 
 .skip-input:hover, .skip-input:focus {
@@ -317,6 +327,7 @@
 .delay-label {
   font-size: 0.8rem;
   color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 .delay-select {

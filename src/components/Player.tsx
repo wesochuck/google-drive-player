@@ -400,6 +400,22 @@ export const Player: React.FC<PlayerProps> = ({
       </div>
 
       <div className="volume-container">
+        {/* SKIP START SETTING */}
+        <div className="skip-setting-container">
+          <label htmlFor="skip-input" className="delay-label">Skip First:</label>
+          <input 
+            id="skip-input"
+            type="number" 
+            min="0"
+            step="0.1"
+            value={skipStart || ''} 
+            onChange={handleSkipStartChange}
+            placeholder="0"
+            className="skip-input"
+          />
+          <span className="unit-label">s</span>
+        </div>
+
         <label>Volume</label>
         <input 
           type="range" 
@@ -425,22 +441,6 @@ export const Player: React.FC<PlayerProps> = ({
             <option value={5}>5s</option>
             <option value={10}>10s</option>
           </select>
-        </div>
-
-        {/* SKIP START SETTING */}
-        <div className="skip-setting-container">
-          <label htmlFor="skip-input" className="delay-label">Skip First:</label>
-          <input 
-            id="skip-input"
-            type="number" 
-            min="0"
-            step="0.1"
-            value={skipStart || ''} 
-            onChange={handleSkipStartChange}
-            placeholder="0"
-            className="skip-input"
-          />
-          <span className="unit-label">s</span>
         </div>
       </div>
     </div>
