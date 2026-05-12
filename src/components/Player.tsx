@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import type { MediaFile } from '../services/blobService';
 import './Player.css';
 
@@ -79,7 +79,7 @@ export const Player: React.FC<PlayerProps> = ({
 
   const currentTrack = playlist[currentIndex];
   const isFolder = currentTrack?.isFolder || false;
-  const firstAudioIndex = Math.max(0, playlist.findIndex(t => !t.isFolder));
+  const firstAudioIndex = useMemo(() => Math.max(0, playlist.findIndex(t => !t.isFolder)), [playlist]);
 
   useEffect(() => {
     cancelCountdown();
@@ -112,7 +112,6 @@ export const Player: React.FC<PlayerProps> = ({
       if (playPromise !== undefined) {
         playPromise.catch(err => {
           if (err.name !== 'AbortError') {
-            console.error("Playback error:", err);
             setPlayError("Could not play this track. It may be unsupported.");
             setIsPlaying(false);
           }
@@ -141,7 +140,6 @@ export const Player: React.FC<PlayerProps> = ({
   };
 
   const handleEnded = () => {
-    const firstAudioIndex = Math.max(0, playlist.findIndex(t => !t.isFolder));
     let nextIndexToPlay: number | null = null;
 
     // Determine what the next track should be
@@ -188,10 +186,9 @@ export const Player: React.FC<PlayerProps> = ({
 
   const handlePrev = () => {
     cancelCountdown();
-    // FIX: Only go back if we are strictly past the first audio index
     if (currentIndex > firstAudioIndex) {
       onTrackChange(currentIndex - 1);
-    } else if (loopMode === 'all') {
+    } else if (currentIndex === firstAudioIndex && loopMode === 'all') {
       onTrackChange(playlist.length - 1);
     }
   };
@@ -201,7 +198,7 @@ export const Player: React.FC<PlayerProps> = ({
     if (currentIndex < playlist.length - 1) {
       onTrackChange(currentIndex + 1);
     } else if (loopMode === 'all') {
-      // FIX: Wrap to the first audio file
+      // Wrap to the first audio file
       onTrackChange(firstAudioIndex);
     }
   };
@@ -294,8 +291,7 @@ export const Player: React.FC<PlayerProps> = ({
           onEnded={handleEnded}
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}
-          onError={(e) => {
-            console.error("Audio playback error:", e);
+          onError={() => {
             setPlayError("Could not load this track. It may be restricted or unsupported.");
             setIsPlaying(false);
           }}
@@ -340,7 +336,6 @@ export const Player: React.FC<PlayerProps> = ({
         <div className="controls-center">
           <button 
             onClick={handlePrev} 
-            // FIX: Disable if it's the first audio track (and not repeating all)
             disabled={isFolder || (currentIndex === firstAudioIndex && loopMode !== 'all')}
             aria-label="Previous"
           >
