@@ -168,7 +168,8 @@
   color: var(--text-secondary);
 }
 
-.volume-container input {
+/* FIX: Only target the range slider, not the number inputs */
+.volume-container input[type="range"] {
   flex-grow: 1;
   height: 4px;
   -webkit-appearance: none;
@@ -177,12 +178,25 @@
   outline: none;
 }
 
-.volume-container input::-webkit-slider-thumb {
+.volume-container input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 10px;
   height: 10px;
   background: var(--text-secondary);
   border-radius: 50%;
+}
+
+/* FIX: Proper height and styling for the Skip First number input */
+.volume-container input[type="number"] {
+  height: auto;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color, #333);
+  background: var(--hover-bg, rgba(255, 255, 255, 0.05));
+  color: var(--text-primary);
+  width: 60px;
+  font-size: 0.9rem;
+  text-align: center;
 }
 
 /* Desktop Overrides */
@@ -284,32 +298,6 @@
   margin-right: auto;
 }
 
-.skip-input {
-  width: 120px;
-  min-width: 120px;
-  flex-shrink: 0;
-  height: 36px;
-  padding: 0.25rem 0.75rem;
-  border-radius: 6px;
-  background-color: var(--card-bg);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  font-size: 0.95rem;
-  outline: none;
-  transition: all 0.2s;
-  text-align: center;
-  box-sizing: border-box;
-}
-
-.skip-input::-webkit-inner-spin-button,
-.skip-input::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.skip-input {
-  -moz-appearance: textfield;
-}
 
 .skip-input:hover, .skip-input:focus {
   border-color: var(--accent-color);
