@@ -1,14 +1,14 @@
 .player {
   background: var(--card-bg);
-  border-radius: 16px;
-  padding: 1rem;
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
   box-shadow: var(--shadow-md);
   margin-bottom: 1.5rem;
   text-align: center;
   min-width: 0;
   width: 100%;
   border: 1px solid var(--border-color);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .player.empty {
@@ -18,13 +18,15 @@
 }
 
 .player h2 {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
+  font-weight: 700;
   margin-top: 0;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: -0.02em;
 }
 
 .progress-container {
@@ -39,10 +41,10 @@
 
 .seek-bar {
   flex-grow: 1;
-  height: 4px;
+  height: 6px;
   -webkit-appearance: none;
   background: var(--border-color);
-  border-radius: 2px;
+  border-radius: 3px;
   outline: none;
   cursor: pointer;
 }
@@ -100,12 +102,13 @@
   width: 48px;
   height: 48px;
   padding: 0;
-  border-radius: 50%;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: var(--shadow-sm);
 }
 
 .controls button:hover:not(:disabled) {
@@ -119,11 +122,11 @@
 }
 
 .controls .play-button {
-  background: var(--accent-color);
-  color: #ffffff;
+  background: var(--text-primary);
+  color: var(--card-bg);
   width: 64px;
   height: 64px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
   border: none;
 }
 
