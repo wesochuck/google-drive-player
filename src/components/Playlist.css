@@ -59,6 +59,10 @@
   color: var(--text-secondary);
   font-size: 0.9rem;
   min-width: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .track-name {
