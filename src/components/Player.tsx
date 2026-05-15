@@ -410,9 +410,9 @@ export const Player: React.FC<PlayerProps> = ({
       </div>
 
       <div className="volume-container">
-        {/* SKIP START SETTING */}
+        {/* START AT SETTING */}
         <div className="skip-setting-container">
-          <label htmlFor="skip-input" className="delay-label">Skip First:</label>
+          <label htmlFor="skip-input" className="delay-label">Start At:</label>
           <input 
             id="skip-input"
             type="number" 
@@ -437,9 +437,9 @@ export const Player: React.FC<PlayerProps> = ({
           disabled={isFolder}
         />
         
-        {/* NEW DELAY SETTING */}
+        {/* INTER-TRACK GAP SETTING */}
         <div className="delay-setting-container">
-          <label htmlFor="delay-select" className="delay-label">Delay:</label>
+          <label htmlFor="delay-select" className="delay-label">Gap:</label>
           <select 
             id="delay-select"
             value={delaySetting} 
@@ -451,6 +451,21 @@ export const Player: React.FC<PlayerProps> = ({
             <option value={5}>5s</option>
             <option value={10}>10s</option>
           </select>
+        </div>
+      </div>
+
+      <div className="playback-hints">
+        <div className="hint">
+          <span className="hint-label">Start At</span>
+          <span className="hint-text">Skips the intro for this specific track; saved for future sessions.</span>
+        </div>
+        <div className="hint">
+          <span className="hint-label">Gap</span>
+          <span className="hint-text">Adds a timed silence between consecutive songs.</span>
+        </div>
+        <div className="hint">
+          <span className="hint-label">Repeat</span>
+          <span className="hint-text">Controls if the playlist stops, loops, or restarts.</span>
         </div>
       </div>
     </div>
